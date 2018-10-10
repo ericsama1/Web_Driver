@@ -1,3 +1,4 @@
+# encoding=utf8
 """ Libreria para poder utilizar las funciones de selenium, permitiendo
 que se pueda utilizar en chrome y en firefox
 Todavia hay funciones que no son compatibles en firefox, en chrome
@@ -6,7 +7,7 @@ import sys
 from base64 import b64decode
 from io import BytesIO
 from random import randrange
-from urllib.request import urlretrieve
+import urllib
 
 from PIL import Image
 from colorama import Fore
@@ -18,7 +19,7 @@ from selenium.common.exceptions import NoSuchElementException, \
     NoAlertPresentException, ElementNotSelectableException, \
     ElementNotVisibleException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.action_chains import ActionChains as AC
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -47,7 +48,7 @@ class Driver:
         :param device: es para pasar por parametro el dispositivo que
                        se quiere utilizar.
         :param headless: flag para habilitar en modo headless
-        :param size: tamano de la ventana del browser, utiliza un dict con
+        :param size: tamaño de la ventana del browser, utiliza un dict con
                      'ancho' y 'alto'
         :param incognito: flag para habilitar el modo incognito
         :param commands: se puede ingresar manualmente comandos para utilizar
@@ -59,7 +60,7 @@ class Driver:
         """
         self.__log = Log('web_driver.log')  # se crea un log en la ubicacion
         self.__menu_size = 0
-        # se deja 1920x1080 como tamano por defecto de las pantallas
+        # se deja 1920x1080 como tamaño por defecto de las pantallas
         # si se usa el headless
         if headless and size is None:
             size = {
@@ -202,8 +203,8 @@ class Driver:
         # chrome
         if position is not None:
             browser_options.add_argument('--window-position={},{}'.format(
-                                                                position['x'],
-                                                                position['y']))
+                position['x'],
+                position['y']))
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
@@ -449,7 +450,7 @@ class Driver:
         """
         if elem is None:  # si no paso un elemento, lo busco
             elem = self.__search_element(by, value)  # busco el elemento
-        tamano = elem.size  # obtengo el tamano el elemento
+        tamano = elem.size  # obtengo el tamaño el elemento
         posicion = elem.location  # obtengo la posicion del elemento
         left = posicion['x']
         top = posicion['y']
@@ -467,7 +468,7 @@ class Driver:
 
         :param by: parametro de busqueda
         :param value: nombre del elemento que se quiere buscar
-        :return: tamano en [width, height] del elemento que se busco
+        :return: tamaño en [width, height] del elemento que se busco
         """
         elem = self.__search_element(by, value)
         return elem.size
@@ -717,14 +718,14 @@ class Driver:
     def tabs(self):
         """ Devuelve los handle de los tabs que estan abierto, esto se
         devuelve en formato de array. La pos 0, es el primer tab,
-        el resto es el orden de la ultima pestana nueva
+        el resto es el orden de la ultima pestaña nueva
 
         :return: devuelvo las pestañas que tiene abierto el browser
         """
         return self.__browser.window_handles
 
     def new_tab(self, url='about:blank'):
-        """ Abre una pestana nueva y se la deja como el tab activo
+        """ Abre una pestaña nueva y se la deja como el tab activo
 
         :param url: url que se quiere abrir en el nuevo tab, por defecto abre
                     about:blank
@@ -969,7 +970,7 @@ class Driver:
                     fh.write(source)
             else:
                 # save to a file
-                urlretrieve(source, dirname)
+                urllib.urlretrieve(source, dirname)
             img = Image.open(dirname)
             self.__log_info("Se encontro el elemento {} y se guardo en {}".
                             format(value, dirname))
@@ -987,7 +988,7 @@ class Driver:
             self.__log_error('No existe el elemento {}'.format(value))
             return False
         else:
-            mover = AC(self.__browser).move_to_element(elem)
+            mover = ActionChains(self.__browser).move_to_element(elem)
             mover.perform()
             self.__log_info(
                 'Se posiciona el mouse sobre el elemento {}'.format(
@@ -1003,7 +1004,7 @@ class Driver:
             self.__log_error('No se encuentra el elemento {}'.format(value))
             return False
         else:
-            AC(self.__browser).double_click(elem)
+            ActionChains(self.__browser).double_click(elem)
             self.__log_info('Se hace doble click sobre el elemento {}'.format(
                 value))
             return True
@@ -1177,7 +1178,7 @@ class Driver:
         self.__log.warning(text)
 
     def set_windows_size(self, size):
-        """ Metodo para cambiar el tamano de la ventana
+        """ Metodo para cambiar el tamaño de la ventana
 
         :param size: un dict que contenga el ancho y el alto
                      de las pantallas que se quiere utilizar
@@ -1227,7 +1228,7 @@ class Driver:
         Metodo para obtener el codigo html de la pagina web
         :return: devuelvo el string del html de la pagina web
         """
-        elem = self.__browser.find_element('xpath','//*')
+        elem = self.__browser.find_element('xpath', '//*')
         source_code = elem.get_attribute('outerHTML')
         self.__log_info("Se obtiene el codigo html de la pagina")
         return source_code
