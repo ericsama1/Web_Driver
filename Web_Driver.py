@@ -10,7 +10,6 @@ from random import randrange
 import urllib
 
 from PIL import Image
-from colorama import Fore
 from pdfkit import from_string
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, \
@@ -82,20 +81,14 @@ class Driver:
             # La emulacion mobile no esta disponible para firefox, solo para
             # chrome
             if device is not None:
-                print ("{}La emulacion mobile no esta habilitada para "
-                       "firefox{}".format(Fore.RED, Fore.RESET))
                 self.__log_warning("La emulacion mobile no esta habilitada "
                                    "para firefox")
             # Cambiar la posicion del navegador no esta habilitado para firefox
             if position is not None:
-                print ("{}El cambio de la posicion no esta habilitada para "
-                       "firefox{}".format(Fore.RED, Fore.RESET))
                 self.__log_warning("El cambio de la posicion no esta "
                                    "habilitada para firefox")
             # El fullscreen del navegador no esta habilitado para firefox
             if fullscreen:
-                print ("{}El fullscreen no esta habilitada para firefox{}".
-                       format(Fore.RED, Fore.RESET))
                 self.__log_warning("El fullscreen no esta habilitada "
                                    "para firefox")
 
@@ -105,8 +98,6 @@ class Driver:
                     firefox_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los parametros"
-                      "{}".format(Fore.RED, Fore.RESET))
                 exit(1)
         elif browser == 'chrome':
             if headless:
@@ -123,8 +114,6 @@ class Driver:
                     chrome_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los parametros"
-                      "{}".format(Fore.RED, Fore.RESET))
                 exit(1)
         if not fullscreen:
             if size is None:
@@ -186,8 +175,7 @@ class Driver:
         else:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
-            print('{}NO se ingreso un navegador valido{}'.format(
-                Fore.RED, Fore.RESET))
+            self.__log_warning("No se ingreso un browser valido")
             sys.exit(1)
 
         # si el flag esta en True, se habilita el modo headless
@@ -880,8 +868,6 @@ class Driver:
         box = self.get_box(by, value)
         if not self.__validate_box(box):
             self.__log_warning('La medida del box ingresado no son validos')
-            print('{}La medida del box ingresado no son validos{}'.format(
-                Fore.RED, Fore.RESET))
             sys.exit(1)
         altura = box['botton'] - box['top']
         browser_size = self.get_windows_size()
@@ -900,8 +886,6 @@ class Driver:
             if not self.__validate_box(box_aux):
                 self.__log_warning(
                     'La medida del box ingresado no son validos')
-                print('{}La medida del box ingresado no son validos{}'.
-                      format(Fore.RED, Fore.RESET))
                 sys.exit(1)
             img = img.crop(self.__box_to_coordinate(box_aux))
             # verifico que no sea la ultima pantalla
@@ -916,8 +900,6 @@ class Driver:
                 if not self.__validate_box(box_aux):
                     self.__log_warning('La medida del box ingresado no '
                                        'son validos')
-                    print('{}La medida del box ingresado no son validos{}'.
-                          format(Fore.RED, Fore.RESET))
                     sys.exit(1)
                 img2 = img2.crop(self.__box_to_coordinate(box_aux))
                 img = self.__combine_image(img, img2)
@@ -1218,8 +1200,6 @@ class Driver:
                             "{}".format(dirname))
             return True
         except OSError:
-            print ('{}Ocurrio un error en la conversion a pdf, '
-                   'revisar el log{}'.format(Fore.RED, Fore.RESET))
             self.__log_error()
             return False
 
