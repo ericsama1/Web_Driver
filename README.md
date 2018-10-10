@@ -7,7 +7,6 @@ en el driver de selenium.
 Para utilizar el Web_Driver, se necesita instalar ciertos paquetes: 
 - Selenium
 - PIL
-- Colorama
 - Pdfkit
 - Driver para chrome
 - Geckodriver
@@ -15,4 +14,4 @@ Para utilizar el Web_Driver, se necesita instalar ciertos paquetes:
 Tambien se precisa asignar en el `settings.py` el `path_chromedriver` y el `path_firefoxdriver` en el correspondiente path de los driver descargados 
 
 Para un mejor manejo, se puede utilizar el mismo driver para levantar una pagina web con el browser de firefox.
-Se puede utilizar firefox con solo llamar a `browser="firefox"` en el inicilizador del driver
+Se puede utilizar firefox con solo inicializar el objeto Driver como `Driver(browser="firefox")`. Por defecto toma a Chrome como browser
