@@ -1,15 +1,14 @@
-# encoding=utf8
 """ Libreria para poder utilizar las funciones de selenium, permitiendo
 que se pueda utilizar en chrome y en firefox
 Todavia hay funciones que no son compatibles en firefox, en chrome
 estan funcionando"""
-import sys
 from base64 import b64decode
 from io import BytesIO
 from random import randrange
-import urllib
+from urllib.request import urlretrieve
 
 from PIL import Image
+from colorama import Fore
 from pdfkit import from_string
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, \
@@ -18,7 +17,7 @@ from selenium.common.exceptions import NoSuchElementException, \
     NoAlertPresentException, ElementNotSelectableException, \
     ElementNotVisibleException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.action_chains import ActionChains as AC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -47,7 +46,7 @@ class Driver:
         :param device: es para pasar por parametro el dispositivo que
                        se quiere utilizar.
         :param headless: flag para habilitar en modo headless
-        :param size: tamaño de la ventana del browser, utiliza un dict con
+        :param size: tamano de la ventana del browser, utiliza un dict con
                      'ancho' y 'alto'
         :param incognito: flag para habilitar el modo incognito
         :param commands: se puede ingresar manualmente comandos para utilizar
@@ -59,7 +58,7 @@ class Driver:
         """
         self.__log = Log('web_driver.log')  # se crea un log en la ubicacion
         self.__menu_size = 0
-        # se deja 1920x1080 como tamaño por defecto de las pantallas
+        # se deja 1920x1080 como tamano por defecto de las pantallas
         # si se usa el headless
         if headless and size is None:
             size = {
@@ -75,20 +74,26 @@ class Driver:
                                              fullscreen)
         if browser == 'firefox':
             # el menu size es los pixeles que usa la barra de direcciones,
-            # el conjunto de las pestañas en firefox
+            # el conjunto de las pestanas en firefox
             self.__menu_size = 75
 
             # La emulacion mobile no esta disponible para firefox, solo para
             # chrome
             if device is not None:
+                print ("{}La emulacion mobile no esta habilitada para "
+                       "firefox{}".format(Fore.RED, Fore.RESET))
                 self.__log_warning("La emulacion mobile no esta habilitada "
                                    "para firefox")
             # Cambiar la posicion del navegador no esta habilitado para firefox
             if position is not None:
+                print ("{}El cambio de la posicion no esta habilitada para "
+                       "firefox{}".format(Fore.RED, Fore.RESET))
                 self.__log_warning("El cambio de la posicion no esta "
                                    "habilitada para firefox")
             # El fullscreen del navegador no esta habilitado para firefox
-            if fullscreen:
+            if not fullscreen:
+                print ("{}El fullscreen no esta habilitada para firefox{}".
+                       format(Fore.RED, Fore.RESET))
                 self.__log_warning("El fullscreen no esta habilitada "
                                    "para firefox")
 
@@ -98,6 +103,8 @@ class Driver:
                     firefox_options=browser_options)
             except WebDriverException:
                 self.__log_error()
+                print("{}No se pudo iniciar el driver, revisar los parametros"
+                      "{}".format(Fore.RED, Fore.RESET))
                 exit(1)
         elif browser == 'chrome':
             if headless:
@@ -105,7 +112,7 @@ class Driver:
                 self.__menu_size = 0
             else:
                 # el menu size es los pixeles que usa la barra de direcciones,
-                # el conjunto de las pestañas, y la alerta de sistema
+                # el conjunto de las pestanas, y la alerta de sistema
                 # automatizado
                 self.__menu_size = 105
             try:
@@ -114,6 +121,8 @@ class Driver:
                     chrome_options=browser_options)
             except WebDriverException:
                 self.__log_error()
+                print("{}No se pudo iniciar el driver, revisar los parametros"
+                      "{}".format(Fore.RED, Fore.RESET))
                 exit(1)
         if not fullscreen:
             if size is None:
@@ -175,7 +184,8 @@ class Driver:
         else:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
-            self.__log_warning("No se ingreso un browser valido")
+            print('{}NO se ingreso un navegador valido{}'.format(
+                Fore.RED, Fore.RESET))
             sys.exit(1)
 
         # si el flag esta en True, se habilita el modo headless
@@ -191,8 +201,8 @@ class Driver:
         # chrome
         if position is not None:
             browser_options.add_argument('--window-position={},{}'.format(
-                position['x'],
-                position['y']))
+                                                                position['x'],
+                                                                position['y']))
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
@@ -399,6 +409,8 @@ class Driver:
 
         :param box1: Box que contiene el elemento del box 2
         :param box2: Box del elemento
+        :return: devuelvo True si el box2 esta dentro del box1
+                 devuelvo False si el box2 NO est dentro del box1
         """
         if box1['botton'] <= box2['botton']:
             return False
@@ -413,19 +425,174 @@ class Driver:
     def check_boxs(self, by, value, class_names):
         """
         Metodo para chequear si el elemento esta dentro del boxs
+        Tambien chequea que los elementos no se pisen entre si
 
         :param by: parametro de busqueda
         :param value: nombre del elemento que se busca
         :param class_names: array con los elementos internos que se busca
-        :return:
+        :return: Si el elemento del array esta dentro del box, devuelvo true,
+                 si un elemento se encuentra 
         """
         elements = self.__get_elements_in_element(by, value, class_names)
         box = self.get_box(by, value)
         for element in elements:
+            # Primero reviso que los elementos se encuentren dentro del boton
             elem_box = self.get_box(by=None, value=None, elem=element)
             if not self.__compare_box(box, elem_box):
+                self.__log_warning('el elemento {} no esta dentro del '
+                                   'box {}'.format(element.get_attibute(
+                                                                    'class'),
+                                                                    value)
+                                    )
+                return False
+            # una vez revisado que los elementos se encuentran dentro del 
+            # boton, reviso que los elementos no se pisen entre ellos
+            aux = elements
+            # creo un array aux para pasar todas las clases, menos el mismo 
+            # elemento 
+            aux.remove(element)
+            elem_aux = self.check_overlap_element(elem_box, aux)
+            if elem_aux is not None:
+                self.__log_warning('hay superposicion en el elemento {} '
+                                   'con el elemento {}'.
+                                   format(element.get_attribute('class'),
+                                          elem_aux.get_attribute('class')
+                                          )
+                                    )
+        return True
+
+    @staticmethod
+    def __check_lateral(box1, box2, filtro):
+        """ 
+        Metodo para comprobar si el box1 esta superpuesto sobre el box2
+        en la direccion que se pasa en la variable quitar
+        :param box1, box2: coordenadas de los boxes que se quiere verificar
+        :param filtro: direccion en la que se quiere verificar
+        :return: devuelvo True si hay superposicion
+                 devuelvo False si NO hay superposicion
+        """
+        # si la direccion no es abajo, reviso si la parte inferior
+        # del box1 se superpone con el box2
+        if filtro != 'botton':
+            if not(box1['botton'] >= box2['top'] and \
+                 box1['botton'] <= box2['botton']):
+                return False
+        # si la direccion no es arriba, reviso si la parte superior
+        # del box1 se superpone con el box2
+        if filtro != 'top':
+            if not(box1['top'] >= box2['top'] and \
+                  box1['top'] <= box2['botton']):
+                return False
+        # si la direccion no es la izquierda, reviso si la parte izquierda
+        # del box1 se superpone con el box2
+        if filtro != 'left':
+            if not(box1['left'] >= box2['left'] and \
+                 box1['left'] <= box2['right']):
+                 return False
+        # si la direccion no es derecha, reviso si la parte inferior
+        # del box1 se superpone con el box2
+        if filtro != 'right':
+            if not(box1['right'] >= box2['left'] and \
+                 box1['right'] <= box2['right']):
                 return False
         return True
+
+    def __lateral(self, box1, box2):
+        """ 
+        Metodo para verificar que el box1 se superpone con un costado
+        del box2
+        :param box1, box2: coordenadas de los boxes que se quiere verificar
+        :return: devuelvo True si hay superposicion
+                 devuelvo False si NO hay superposicion
+        """
+        # me fijo si el box1 esta en la parte superior del box2 
+        if box2['top'] >= box1['top'] and box2['top'] <= box1['botton']:
+            if self.__check_lateral(box1, box2, "top"):
+                return True
+        # me fijo si el box1 esta en la parte derecha del box2
+        if box2['right'] >= box1['left'] and box2['right'] <= box1['right']:
+            if self.__check_lateral(box1, box2, "right"):
+                return True
+        # me fijo si el box1 esta en la parte inferior del box2
+        if box2['botton'] >= box1['top'] and \
+             box2['botton'] <= box1['botton']:
+            if self.__check_lateral(box1,box2, "botton"):
+                return True
+        # me fijo si el box1 esta en la parte izquierda del box2
+        if box2['left'] >= box1['left'] and box2['left'] <= box1['right']:
+            if self.__check_lateral(box1,box2, "left"):
+                return True
+        return False
+
+    @staticmethod
+    def __two_lateral(box1, box2):
+        """ 
+        Metodo para verificar si hay superposicion de los elementos
+        en las puntas de ambos
+        :param box1, box2: medidas para verificar que no se 
+                           superpongan entre si
+        :return: devuelvo True, si hay superposicion
+                 devuelvo False, si no hay superposicion 
+        """
+        # pregunto por el area superior de la superposicion entre los 
+        # boxes
+        area_top = box2['top'] >= box1['top'] and \
+                   box2['top'] <= box1['botton']
+        # verifico que el area inferior de la superposicion se encuentre 
+        # dentro de los boxes
+        area_botton = box1['botton'] >= box2['top'] and \
+                      box1['botton'] <= box2['botton']
+        if area_top:
+            if area_botton:
+                # pregunto si el box1 se encuentra mas a la derecha que 
+                # el box2
+                if box2['right'] >= box1['left']and \
+                   box2['right'] <= box1['right']:
+                    if box2['left'] >= box1['left'] and \
+                       box2['left'] <= box1['right']:
+                        return True
+                # si el box1 esta mas a la izquierda que el box2, paso
+                # por aca
+                elif box1['right'] >= box2['left'] and \
+                     box1['right'] <= box2['right']:
+                        if box2['left'] >= box1['left'] and \
+                           box2['left'] <= box1['right']:
+                           return True
+        return False
+
+    def __compare_overlap(self, box1, box2):
+        """ 
+        Metodo para chequear si hay superposicion entre los 2 boxes
+        :param box1, box2: dos medidas para verificar que no se 
+                           superpongan entre si
+        :return: devuelvo False, si NO hay superposicion
+                 devuelvo True, si hay superposicion
+        """
+        if self.__compare_box(box1, box2):
+            return True
+        if self.__two_lateral(box1, box2):
+            return True
+        if self.__lateral(box1, box2):
+            return True
+        return False
+
+    def check_overlap_element(self, elem_box, class_names):
+        """ 
+        Metodo para revisar si hay superposicion de los elementos 
+        de un boton
+        :param elem_box: elemento que se quiere revisar
+        :param class_names: nombre de las clases que hay en el boton
+        :return: si encuentro superposicion, devuelvo el elemento que 
+                 se hace la superposicion
+        """
+        for element in class_names:
+            element_box = self.get_box(by=None, value=None, elem=element)
+            if self.__compare_overlap(elem_box, element_box):
+                # si hay superposicion, devuelvo el elemento
+                return element
+            else:
+                # si no hay superposicion, devuelvo None
+                return None
 
     def get_box(self, by, value, elem=None):
         """
@@ -438,7 +605,7 @@ class Driver:
         """
         if elem is None:  # si no paso un elemento, lo busco
             elem = self.__search_element(by, value)  # busco el elemento
-        tamano = elem.size  # obtengo el tamaño el elemento
+        tamano = elem.size  # obtengo el tamano el elemento
         posicion = elem.location  # obtengo la posicion del elemento
         left = posicion['x']
         top = posicion['y']
@@ -456,7 +623,7 @@ class Driver:
 
         :param by: parametro de busqueda
         :param value: nombre del elemento que se quiere buscar
-        :return: tamaño en [width, height] del elemento que se busco
+        :return: tamano en [width, height] del elemento que se busco
         """
         elem = self.__search_element(by, value)
         return elem.size
@@ -706,14 +873,14 @@ class Driver:
     def tabs(self):
         """ Devuelve los handle de los tabs que estan abierto, esto se
         devuelve en formato de array. La pos 0, es el primer tab,
-        el resto es el orden de la ultima pestaña nueva
+        el resto es el orden de la ultima pestana nueva
 
-        :return: devuelvo las pestañas que tiene abierto el browser
+        :return: devuelvo las pestanas que tiene abierto el browser
         """
         return self.__browser.window_handles
 
     def new_tab(self, url='about:blank'):
-        """ Abre una pestaña nueva y se la deja como el tab activo
+        """ Abre una pestana nueva y se la deja como el tab activo
 
         :param url: url que se quiere abrir en el nuevo tab, por defecto abre
                     about:blank
@@ -868,6 +1035,8 @@ class Driver:
         box = self.get_box(by, value)
         if not self.__validate_box(box):
             self.__log_warning('La medida del box ingresado no son validos')
+            print('{}La medida del box ingresado no son validos{}'.format(
+                Fore.RED, Fore.RESET))
             sys.exit(1)
         altura = box['botton'] - box['top']
         browser_size = self.get_windows_size()
@@ -886,6 +1055,8 @@ class Driver:
             if not self.__validate_box(box_aux):
                 self.__log_warning(
                     'La medida del box ingresado no son validos')
+                print('{}La medida del box ingresado no son validos{}'.
+                      format(Fore.RED, Fore.RESET))
                 sys.exit(1)
             img = img.crop(self.__box_to_coordinate(box_aux))
             # verifico que no sea la ultima pantalla
@@ -900,6 +1071,8 @@ class Driver:
                 if not self.__validate_box(box_aux):
                     self.__log_warning('La medida del box ingresado no '
                                        'son validos')
+                    print('{}La medida del box ingresado no son validos{}'.
+                          format(Fore.RED, Fore.RESET))
                     sys.exit(1)
                 img2 = img2.crop(self.__box_to_coordinate(box_aux))
                 img = self.__combine_image(img, img2)
@@ -952,7 +1125,7 @@ class Driver:
                     fh.write(source)
             else:
                 # save to a file
-                urllib.urlretrieve(source, dirname)
+                urlretrieve(source, dirname)
             img = Image.open(dirname)
             self.__log_info("Se encontro el elemento {} y se guardo en {}".
                             format(value, dirname))
@@ -970,7 +1143,7 @@ class Driver:
             self.__log_error('No existe el elemento {}'.format(value))
             return False
         else:
-            mover = ActionChains(self.__browser).move_to_element(elem)
+            mover = AC(self.__browser).move_to_element(elem)
             mover.perform()
             self.__log_info(
                 'Se posiciona el mouse sobre el elemento {}'.format(
@@ -986,7 +1159,7 @@ class Driver:
             self.__log_error('No se encuentra el elemento {}'.format(value))
             return False
         else:
-            ActionChains(self.__browser).double_click(elem)
+            AC(self.__browser).double_click(elem)
             self.__log_info('Se hace doble click sobre el elemento {}'.format(
                 value))
             return True
@@ -1160,7 +1333,7 @@ class Driver:
         self.__log.warning(text)
 
     def set_windows_size(self, size):
-        """ Metodo para cambiar el tamaño de la ventana
+        """ Metodo para cambiar el tamano de la ventana
 
         :param size: un dict que contenga el ancho y el alto
                      de las pantallas que se quiere utilizar
@@ -1173,7 +1346,7 @@ class Driver:
         return True
 
     def get_windows_size(self):
-        """ Metodo para obtener el tamaño de la ventana del navegador """
+        """ Metodo para obtener el tamano de la ventana del navegador """
         return self.__browser.get_window_size()
 
     def maximize_windows(self):
@@ -1200,6 +1373,8 @@ class Driver:
                             "{}".format(dirname))
             return True
         except OSError:
+            print ('{}Ocurrio un error en la conversion a pdf, '
+                   'revisar el log{}'.format(Fore.RED, Fore.RESET))
             self.__log_error()
             return False
 
@@ -1208,7 +1383,7 @@ class Driver:
         Metodo para obtener el codigo html de la pagina web
         :return: devuelvo el string del html de la pagina web
         """
-        elem = self.__browser.find_element('xpath', '//*')
+        elem = self.__browser.find_element('xpath','//*')
         source_code = elem.get_attribute('outerHTML')
         self.__log_info("Se obtiene el codigo html de la pagina")
         return source_code
