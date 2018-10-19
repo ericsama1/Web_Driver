@@ -1,4 +1,3 @@
-import sys; sys.path.append('..')
 from Web_Driver import Driver
 from time import sleep
 

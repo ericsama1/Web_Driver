@@ -1,5 +1,4 @@
 """Metodo para obtener el logo del google"""
-import sys; sys.path.append('..')
 from Web_Driver import Driver
 from time import sleep
 
