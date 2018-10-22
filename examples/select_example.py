@@ -9,6 +9,8 @@ def main():
     sleep(1)
     driver.select_by_text('name', 'sport', 'Tennis')
     sleep(1)
+    driver.select_by_index('name', 'sport', 0)
+    sleep(1)
     driver.select_random('name', 'sport')
     sleep(1)
     driver.close()
