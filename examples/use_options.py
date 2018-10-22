@@ -1,4 +1,4 @@
-
+"""Use firefox browser and incognito mode"""
 from Web_Driver import Driver
 from time import sleep
 
