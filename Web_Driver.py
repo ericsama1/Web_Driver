@@ -5,7 +5,7 @@ estan funcionando"""
 import sys
 from base64 import b64decode
 from io import BytesIO
-from random import randrange
+from random import choice
 from urllib.request import urlretrieve
 
 from PIL import Image
@@ -694,6 +694,18 @@ class Driver:
         else:
             return False
 
+    def __select_opction(self, by, value, texto):
+        """Metodo para seleccionar una opcion del select
+        :param by: parametro de busqueda
+        :param value: nombre del select
+        :param texto: texto del elemento que se quiere seleccionar"""
+        select = Select(self.__browser.find_element(by, value))
+        # uso el visible text, ya que si no se muestra el texto, no 
+        # tiene sentido el uso del select
+        select.select_by_visible_text(texto)
+        self.__log_info("Se selecciona el valor {} en el select "
+                        "{}".format(texto, value) )
+
     def select_by_text(self, by, value, valor):
         """ Seleccionar un elemento de un select, se busca por ID
         
@@ -702,22 +714,25 @@ class Driver:
         :param valor: el valor que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            select = Select(self.__search_element(by, value))
-        except (NoSuchElementException, UnexpectedTagNameException):
-            # si no existe el select con el id ingresado
-            self.__log_error('El select {}, no existe'.format(value))
+        # Obtengo las opciones dentro del select
+        opciones = self.get_select_options(by, value)
+        # Si opciones es None, es porque no existe 
+        if opciones is None:
             return False
         else:
-            try:
-                select.select_by_visible_text(valor)
-                self.__log_info('Se selecciona el valor {} en el select de {}'
-                                .format(valor, value))
+            esta = False
+            # Recorro las opciones para verificar que existe la opcion
+            for opcion in opciones:
+                if valor == opcion.text:
+                    esta  = True
+            # Si esta, entonces lo selecciono
+            if esta:
+                self.__select_opction(by, value, valor)
                 return True
-            except NoSuchElementException:  # si no existe el valor
-                self.__log_error(
-                    'El valor {}, no existe en el select {}'.format(
-                        valor, value))
+            # Si no esta, devuelvo un False y lo escribo en el log
+            else:
+                self.__log_warning("No existe la opcion {} en el select"
+                                   "{}".format(valor, value))
                 return False
 
     def select_random(self, by, value):
@@ -727,22 +742,16 @@ class Driver:
         :param value: nombre del Select que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            select = Select(self.__search_element(by, value))
-        except (NoSuchElementException, UnexpectedTagNameException):
-            # si no se encuentra el elemento, devuelvo un False
-            self.__log_error('El select {}, no existe'.format(value))
+        # Obtengo las opciones dentro del select
+        opciones = self.get_select_options(by, value) 
+        # Si opciones es None, es porque no existe 
+        if opciones is None:
             return False
-        # si se encuentra el elemento sigo
-        try:
-            valor = select.select_by_index(randrange(1, len(select.options)))
-            self.__log_info('Se selecciona el valor {} en el select de '
-                            '{}'.format(valor, value))
+        else:
+            # Selecciono una opcion cualquiera del select
+            valor = choice(opciones)
+            self.__select_opction(by, value, valor.text)
             return True
-        except IndexError:
-            self.__log_error('El numero esta fuera de rango, o el '
-                             'select esta vacio')
-            return False
 
     def select_by_index(self, by, value, index):
         """
@@ -754,16 +763,15 @@ class Driver:
         :param index: indice del elemento que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            select = Select(self.__search_element(by, value))
-        except (NoSuchElementException, UnexpectedTagNameException):
-            self.__log_error('El select {}, no existe'.format(value))
+        # obtengo los valores del select
+        opciones = self.get_select_options(by, value) 
+        # Si opciones es None, es porque no existe 
+        if opciones is None:
             return False
         else:
-            # si se encuentra el elemento, sigo
-            valor = select.select_by_index(index)
-            self.__log_info('Se selecciona el valor {} en el select de  {}'
-                            .format(valor, value))
+            # Obtengo el valor de la posicion index y lo selecciono
+            valor = opciones[index]
+            self.__select_opction(by, value, valor.text)
             return True
 
     def select_by_value(self, by, value, select_value):
@@ -776,27 +784,40 @@ class Driver:
         :param select_value:  value del elemento que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            select = Select(self.__search_element(by, value))
-        except (NoSuchElementException, UnexpectedTagNameException):
-            self.__log_error('El select {}, no existe'.format(value))
+        # Obtengo las opciones dentro del select
+        opciones = self.get_select_options(by, value)
+        # Si opciones es None, es porque no existe 
+        if opciones is None:
             return False
         else:
-            # si se encuentra el elemento, sigo
-            valor = select.select_by_value(select_value)
-            self.__log_info('Se seleccionar el valor {} en el select de {}'
-                            .format(valor, value))
-            return True
+            texto = ''
+            # Recorro todas las opciones 
+            for opcion in opciones:
+                # Obtengo el atributo "value" de la opcion
+                valor = opcion.get_atributte('value')
+                # Si el atributo coincide con el select_value guardo
+                # el texto
+                if valor == select_value:
+                    texto = opcion.text()
+            # Si el texto es '', es que no existe el select_value 
+            # ingresado 
+            if texto == '':
+                return False
+            # Sino, selecciono la opcion
+            else:
+                self.__select_opction(by, value, texto)
+                return True
 
-    def get_select_options(self, value):
+    def get_select_options(self, by, value):
         """
         Metodo para obtener todas las opciones dentro de un select \
         las opciones se lee con el atributo text de cada opcion
+        :param by: parametro de busqueda
         :param value: nombre del elemento que se quiere buscar
         :return: array con todas las opciones que se puede seleccionar \
                  dentro del Select
         """
-        select = Select(self.__search_element(By.ID, value))
+        select = Select(self.__search_element(by, value))
         return select.options
 
     def check(self, value):
