@@ -28,14 +28,8 @@ from settings import path_firefoxdriver, path_chromedriver
 
 
 class Driver:
-    def __init__(self,
-                 browser='chrome',
-                 device=None,
-                 headless=False,
-                 size=None,
-                 incognito=False,
-                 commands=None,
-                 position=None,
+    def __init__(self, browser='chrome', device=None, headless=False,
+                 size=None, incognito=False, commands=None, position=None,
                  fullscreen=False
                  ):
         """Inicializador del driver
@@ -65,12 +59,8 @@ class Driver:
                 "ancho": 1920,
                 "alto": 1080
             }
-        browser_options = self.__set_options(browser,
-                                             device,
-                                             headless,
-                                             incognito,
-                                             commands,
-                                             position,
+        browser_options = self.__set_options(browser, device, headless,
+                                             incognito, commands, position,
                                              fullscreen)
         if browser == 'firefox':
             # el menu size es los pixeles que usa la barra de direcciones,
@@ -133,14 +123,8 @@ class Driver:
                 self.set_windows_size(size)
         self.__browser.implicitly_wait(0.3)  # timeout para el wait,
 
-    def __set_options(self,
-                      browser,
-                      device,
-                      headless,
-                      incognito,
-                      commands,
-                      position,
-                      fullscreen):
+    def __set_options(self, browser, device, headless, incognito,
+                      commands, position, fullscreen):
         """
         Metodo para setear las opciones para los navegadores. Se dejan los \
         argumentos que no funcionan en firefox, ya que estos no afectan \
