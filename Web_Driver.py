@@ -2,6 +2,7 @@
 que se pueda utilizar en chrome y en firefox \
 Todavia hay funciones que no son compatibles en firefox, en chrome \
 estan funcionando"""
+import sys
 from base64 import b64decode
 from io import BytesIO
 from random import randrange
@@ -81,7 +82,7 @@ class Driver:
                 self.__log_warning("El cambio de la posicion no esta "
                                    "habilitada para firefox")
             # El fullscreen del navegador no esta habilitado para firefox
-            if not fullscreen:
+            if fullscreen:
                 print ("{}El fullscreen no esta habilitada para firefox{}".
                        format(Fore.RED, Fore.RESET))
                 self.__log_warning("El fullscreen no esta habilitada "
