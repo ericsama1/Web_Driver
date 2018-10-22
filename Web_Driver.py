@@ -510,19 +510,20 @@ class Driver:
             if self.__check_lateral(box1, box2, "top"):
                 return True
         # me fijo si el box1 esta en la parte derecha del box2
-        if box2['right'] >= box1['left'] and box2['right'] <= box1['right']:
+        elif box2['right'] >= box1['left'] and box2['right'] <= box1['right']:
             if self.__check_lateral(box1, box2, "right"):
                 return True
         # me fijo si el box1 esta en la parte inferior del box2
-        if box2['botton'] >= box1['top'] and \
+        elif box2['botton'] >= box1['top'] and \
              box2['botton'] <= box1['botton']:
             if self.__check_lateral(box1,box2, "botton"):
                 return True
         # me fijo si el box1 esta en la parte izquierda del box2
-        if box2['left'] >= box1['left'] and box2['left'] <= box1['right']:
+        elif box2['left'] >= box1['left'] and box2['left'] <= box1['right']:
             if self.__check_lateral(box1,box2, "left"):
                 return True
-        return False
+        else: 
+            return False
 
     @staticmethod
     def __two_lateral(box1, box2):
@@ -560,7 +561,7 @@ class Driver:
                            return True
         return False
 
-    def __compare_overlap(self, box1, box2):
+    def compare_overlap(self, box1, box2):
         """ 
         Metodo para chequear si hay superposicion entre los 2 boxes
         :param box1, box2: dos medidas para verificar que no se 
@@ -570,11 +571,12 @@ class Driver:
         """
         if self.__compare_box(box1, box2):
             return True
-        if self.__two_lateral(box1, box2):
+        elif self.__two_lateral(box1, box2):
             return True
-        if self.__lateral(box1, box2):
+        elif self.__lateral(box1, box2):
             return True
-        return False
+        else:
+            return False
 
     def check_overlap_element(self, elem_box, class_names):
         """ 
