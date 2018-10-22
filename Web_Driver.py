@@ -925,11 +925,11 @@ class Driver:
         return True
 
     def close_tab(self):
-        """ cierra el tab actual y deja activo el ultimo tab
+        """ cierra el tab actual y deja activo el primer tab
         :return: devuelvo un booleano, por si se pudo realizar la accion"""
         try:
             self.__browser.close()
-            self.change_tab(self.tabs()[len(self.tabs()) - 1])
+            self.change_tab(self.tabs()[0])
             self.__log_info('Se cierra el tab actual')
         except WebDriverException:
             self.__log_error('No hay ningun tab abierto para seleccionar')
