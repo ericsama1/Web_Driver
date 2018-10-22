@@ -12,7 +12,10 @@ def main():
     sleep(1)
     driver.send_text_to_input('id', 'lst-ib', 'Hello World!')
     driver.send_enter_key('id', 'lst-ib')
-    sleep(2)
+    sleep(1)
+    driver.close_tab()
+    sleep(1)
+    driver.close()
 
 
 if __name__ == '__main__':
