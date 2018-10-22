@@ -1,7 +1,7 @@
-""" Libreria para poder utilizar las funciones de selenium, permitiendo \
-que se pueda utilizar en chrome y en firefox \
-Todavia hay funciones que no son compatibles en firefox, en chrome \
-estan funcionando"""
+#    Libreria para poder utilizar las funciones de selenium, permitiendo 
+#    que se pueda utilizar en chrome y en firefox 
+#    Todavia hay funciones que no son compatibles en firefox, en chrome 
+#    estan funcionando
 import sys
 from base64 import b64decode
 from io import BytesIO
@@ -12,11 +12,11 @@ from PIL import Image
 from colorama import Fore
 from pdfkit import from_string, from_url
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, \
-    ElementClickInterceptedException, UnexpectedTagNameException, \
-    NoSuchWindowException, WebDriverException, InvalidElementStateException, \
-    NoAlertPresentException, ElementNotSelectableException, \
-    ElementNotVisibleException
+from selenium.common.exceptions import (NoSuchElementException, 
+    ElementClickInterceptedException, UnexpectedTagNameException,  
+    NoSuchWindowException, WebDriverException, InvalidElementStateException, 
+    NoAlertPresentException, ElementNotSelectableException, 
+    ElementNotVisibleException)
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.action_chains import ActionChains as AC
 from selenium.webdriver.common.by import By
@@ -35,20 +35,20 @@ class Driver:
                  ):
         """Inicializador del driver
 
-        :param browser: Se ingresa el navegador que se quiere utilizar, \
-                        por momentos solo se puede utilizar \
+        :param browser: Se ingresa el navegador que se quiere utilizar, 
+                        por momentos solo se puede utilizar 
                         firefox y chrome
-        :param device: es para pasar por parametro el dispositivo que \
+        :param device: es para pasar por parametro el dispositivo que 
                        se quiere utilizar.
         :param headless: flag para habilitar en modo headless
-        :param size: tamano de la ventana del browser, utiliza un dict con \
+        :param size: tamano de la ventana del browser, utiliza un dict con 
                      'ancho' y 'alto'
         :param incognito: flag para habilitar el modo incognito
-        :param commands: se puede ingresar manualmente comandos para utilizar \
+        :param commands: se puede ingresar manualmente comandos para utilizar 
                          en el driver
-        :param position: posicion que se quiere abrir el browser, utiliza un \
+        :param position: posicion que se quiere abrir el browser, utiliza un 
                          dict con 'x' e 'y', solo funciona con chrome
-        :param fullscreen: flag para habilitar el modo fullscreen, solo \
+        :param fullscreen: flag para habilitar el modo fullscreen, solo 
                            funciona con chrome
         """
         self.__log = Log('web_driver.log')  # se crea un log en la ubicacion
@@ -94,8 +94,8 @@ class Driver:
                     firefox_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los parametros"
-                      "{}".format(Fore.RED, Fore.RESET))
+                print("{}No se pudo iniciar el driver, revisar los "
+                      "parametros {}".format(Fore.RED, Fore.RESET))
                 exit(1)
         elif browser == 'chrome':
             if headless:
@@ -112,8 +112,8 @@ class Driver:
                     chrome_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los parametros"
-                      "{}".format(Fore.RED, Fore.RESET))
+                print("{}No se pudo iniciar el driver, revisar los "
+                      "parametros {}".format(Fore.RED, Fore.RESET))
                 exit(1)
         if not fullscreen:
             if size is None:
@@ -127,19 +127,20 @@ class Driver:
     def __set_options(self, browser, device, headless, incognito,
                       commands, position, fullscreen):
         """
-        Metodo para setear las opciones para los navegadores. Se dejan los \
-        argumentos que no funcionan en firefox, ya que estos no afectan \
-        al browser
+        Metodo para setear las opciones para los navegadores. Se 
+        dejan los argumentos que no funcionan en firefox, ya que 
+        estos no afectan al browser
 
         :param browser: nombre del navegador que se utiliza
         :param device: nombre del dispositivo movil
         :param headless: flag para habilitar la opcion de headless
         :param incognito: flag para habilitar el modo incognito
-        :param commands: se puede ingresar manualmente comandos para utilizar \
-                         en el driver
-        :param position: posicion que se quiere abrir el browser, utiliza un \
-                         dict con 'x' e 'y', solo funciona con chrome
-        :param fullscreen: flag para habilitar el modo fullscreen, solo \
+        :param commands: se puede ingresar manualmente comandos 
+                         para utilizar en el driver
+        :param position: posicion que se quiere abrir el browser, 
+                         utiliza un dict con 'x' e 'y', solo 
+                         funciona con chrome
+        :param fullscreen: flag para habilitar el modo fullscreen, solo 
                            funciona con chrome
         :return: devuelvo un Options segun el navegador que utilizo
         """
@@ -212,10 +213,10 @@ class Driver:
     def __search_element(self, by, value):
         """Metodo para buscar un elemento dentro de la pagina
 
-        :param by: los argumentos son los mismos que tiene el \
+        :param by: los argumentos son los mismos que tiene el 
                    elemento By de selenium
         :param value: es el nombre del elemento que se quiere buscar
-        :param return: devuelve un elemento si se encuentra, \
+        :param return: devuelve un elemento si se encuentra, 
                        sino devuelve None
         """
         self.__log_info('Se busca el elemento "{}" por {}'.format(value, by))
@@ -229,7 +230,7 @@ class Driver:
 
     def search_ids(self, by, value):
         """
-        Metodo para buscar varios elementos, y devolver un array \
+        Metodo para buscar varios elementos, y devolver un array 
         con los ids de dichos elementos
 
         :param by: los argumentos de busqueda
@@ -254,8 +255,8 @@ class Driver:
         return ids
 
     def __search_many_elements(self, by, value):
-        """ buscador de conjunto de elementos por diferentes criterios \n
-        Los parametros utilizado son los mismos que el \
+        """ buscador de conjunto de elementos por diferentes criterios 
+        Los parametros utilizado son los mismos que el 
         metodo __search_element
 
         :param by: parametro de busqueda
@@ -272,7 +273,7 @@ class Driver:
 
     def obtener_input_texto_error(self):
         """
-        Metodo para buscar el error, este no es generico, sirve solo para \
+        Metodo para buscar el error, este no es generico, sirve solo para 
         el form de registro
         """
         try:
@@ -300,8 +301,8 @@ class Driver:
 
     def buscar_error(self):
         """
-        Metodo para que se busque errores, pero sin utilizar el metodo de \
-        busqueda, ya que el otro metodo muestra un warning cuando no hay \
+        Metodo para que se busque errores, pero sin utilizar el metodo de 
+        busqueda, ya que el otro metodo muestra un warning cuando no hay 
         errores
 
         :return: Si es True, hay errores; si es False, no hay errores
@@ -363,14 +364,15 @@ class Driver:
 
     def __get_elements_in_element(self, by, value, class_names):
         """
-        Metodo para obtener los elementos que se encuentran dentro de otro \
-        elemento
+        Metodo para obtener los elementos que se encuentran dentro 
+        de otro elemento
 
         :param by: parametro de busqueda
         :param value: nombre del elemento que contiene los elementos
-        :param class_names: array con los nombres de las clases que se \
-                            quiere verificar
-        :return: devuelvo un array con los elementos si es que los tiene
+        :param class_names: array con los nombres de las clases 
+                            que se quiere verificar
+        :return: devuelvo un array con los elementos si es 
+                 que los tiene
         """
         elem = self.__search_element(by, value)
         elements = []
@@ -394,7 +396,7 @@ class Driver:
 
         :param box1: Box que contiene el elemento del box 2
         :param box2: Box del elemento
-        :return: devuelvo True si el box2 esta dentro del box1 \
+        :return: devuelvo True si el box2 esta dentro del box1 
                  devuelvo False si el box2 NO est dentro del box1
         """
         if box1['botton'] <= box2['botton']:
@@ -409,13 +411,13 @@ class Driver:
 
     def check_boxs(self, by, value, class_names):
         """
-        Metodo para chequear si el elemento esta dentro del boxs \
+        Metodo para chequear si el elemento esta dentro del boxs 
         Tambien chequea que los elementos no se pisen entre si
 
         :param by: parametro de busqueda
         :param value: nombre del elemento que se busca
         :param class_names: array con los elementos internos que se busca
-        :return: Si el elemento del array esta dentro del box, devuelvo \
+        :return: Si el elemento del array esta dentro del box, devuelvo 
                  true, si un elemento se encuentra 
         """
         elements = self.__get_elements_in_element(by, value, class_names)
@@ -449,45 +451,45 @@ class Driver:
     @staticmethod
     def __check_lateral(box1, box2, filtro):
         """ 
-        Metodo para comprobar si el box1 esta superpuesto sobre el box2 \
+        Metodo para comprobar si el box1 esta superpuesto sobre el box2 
         en la direccion que se pasa en la variable quitar
         :param box1, box2: coordenadas de los boxes que se quiere verificar
         :param filtro: direccion en la que se quiere verificar
-        :return: devuelvo True si hay superposicion \
+        :return: devuelvo True si hay superposicion 
                  devuelvo False si NO hay superposicion
         """
         # si la direccion no es abajo, reviso si la parte inferior
         # del box1 se superpone con el box2
         if filtro != 'botton':
-            if not(box1['botton'] >= box2['top'] and \
-                 box1['botton'] <= box2['botton']):
+            if (not(box1['botton'] >= box2['top'] and 
+                 box1['botton'] <= box2['botton'])):
                 return False
         # si la direccion no es arriba, reviso si la parte superior
         # del box1 se superpone con el box2
         if filtro != 'top':
-            if not(box1['top'] >= box2['top'] and \
-                  box1['top'] <= box2['botton']):
+            if (not(box1['top'] >= box2['top'] and 
+                  box1['top'] <= box2['botton'])):
                 return False
         # si la direccion no es la izquierda, reviso si la parte izquierda
         # del box1 se superpone con el box2
         if filtro != 'left':
-            if not(box1['left'] >= box2['left'] and \
-                 box1['left'] <= box2['right']):
+            if (not(box1['left'] >= box2['left'] and 
+                 box1['left'] <= box2['right'])):
                  return False
         # si la direccion no es derecha, reviso si la parte inferior
         # del box1 se superpone con el box2
         if filtro != 'right':
-            if not(box1['right'] >= box2['left'] and \
-                 box1['right'] <= box2['right']):
+            if (not(box1['right'] >= box2['left'] and 
+                 box1['right'] <= box2['right'])):
                 return False
         return True
 
     def __lateral(self, box1, box2):
         """ 
-        Metodo para verificar que el box1 se superpone con un costado \
+        Metodo para verificar que el box1 se superpone con un costado 
         del box2
         :param box1, box2: coordenadas de los boxes que se quiere verificar
-        :return: devuelvo True si hay superposicion \
+        :return: devuelvo True si hay superposicion 
                  devuelvo False si NO hay superposicion
         """
         # me fijo si el box1 esta en la parte superior del box2 
@@ -499,8 +501,8 @@ class Driver:
             if self.__check_lateral(box1, box2, "right"):
                 return True
         # me fijo si el box1 esta en la parte inferior del box2
-        elif box2['botton'] >= box1['top'] and \
-             box2['botton'] <= box1['botton']:
+        elif (box2['botton'] >= box1['top'] and 
+              box2['botton'] <= box1['botton']):
             if self.__check_lateral(box1,box2, "botton"):
                 return True
         # me fijo si el box1 esta en la parte izquierda del box2
@@ -513,45 +515,45 @@ class Driver:
     @staticmethod
     def __two_lateral(box1, box2):
         """ 
-        Metodo para verificar si hay superposicion de los elementos \
+        Metodo para verificar si hay superposicion de los elementos 
         en las puntas de ambos
-        :param box1, box2: medidas para verificar que no se \
+        :param box1, box2: medidas para verificar que no se 
                            superpongan entre si
-        :return: devuelvo True, si hay superposicion \
+        :return: devuelvo True, si hay superposicion 
                  devuelvo False, si no hay superposicion 
         """
         # pregunto por el area superior de la superposicion entre los 
         # boxes
-        area_top = box2['top'] >= box1['top'] and \
-                   box2['top'] <= box1['botton']
+        area_top = (box2['top'] >= box1['top'] and 
+                        box2['top'] <= box1['botton'])
         # verifico que el area inferior de la superposicion se encuentre 
         # dentro de los boxes
-        area_botton = box1['botton'] >= box2['top'] and \
-                      box1['botton'] <= box2['botton']
+        area_botton = (box1['botton'] >= box2['top'] and 
+                        box1['botton'] <= box2['botton'])
         if area_top:
             if area_botton:
                 # pregunto si el box1 se encuentra mas a la derecha que 
                 # el box2
-                if box2['right'] >= box1['left']and \
-                   box2['right'] <= box1['right']:
-                    if box2['left'] >= box1['left'] and \
-                       box2['left'] <= box1['right']:
+                if (box2['right'] >= box1['left']and 
+                        box2['right'] <= box1['right']):
+                    if (box2['left'] >= box1['left'] and 
+                            box2['left'] <= box1['right']):
                         return True
                 # si el box1 esta mas a la izquierda que el box2, paso
                 # por aca
-                elif box1['right'] >= box2['left'] and \
-                     box1['right'] <= box2['right']:
-                        if box2['left'] >= box1['left'] and \
-                           box2['left'] <= box1['right']:
+                elif (box1['right'] >= box2['left'] and 
+                        box1['right'] <= box2['right']):
+                        if (box2['left'] >= box1['left'] and 
+                                box2['left'] <= box1['right']):
                            return True
         return False
 
     def __compare_overlap(self, box1, box2):
         """ 
         Metodo para chequear si hay superposicion entre los 2 boxes
-        :param box1, box2: dos medidas para verificar que no se \
+        :param box1, box2: dos medidas para verificar que no se 
                            superpongan entre si
-        :return: devuelvo False, si NO hay superposicion \
+        :return: devuelvo False, si NO hay superposicion 
                  devuelvo True, si hay superposicion
         """
         if self.__compare_box(box1, box2):
@@ -565,11 +567,11 @@ class Driver:
 
     def check_overlap_element(self, elem_box, class_names):
         """ 
-        Metodo para revisar si hay superposicion de los elementos \
+        Metodo para revisar si hay superposicion de los elementos 
         de un boton
         :param elem_box: elemento que se quiere revisar
         :param class_names: nombre de las clases que hay en el boton
-        :return: si encuentro superposicion, devuelvo el elemento que \
+        :return: si encuentro superposicion, devuelvo el elemento que 
                  se hace la superposicion
         """
         for element in class_names:
@@ -626,7 +628,7 @@ class Driver:
         return elem.location
 
     def send_text_to_input(self, by, value, text):
-        """ Funcion para buscar un elemento y mandarle por teclado el texto \
+        """ Funcion para buscar un elemento y mandarle por teclado el texto 
         que se le quiere ingresar
 
         :param by: parametro para el metodo de busqueda
@@ -672,7 +674,7 @@ class Driver:
 
     def click_by_text(self, text, tagname='*'):
         """
-        Click sobre un elemento por texto \
+        Click sobre un elemento por texto 
         Se clickea el primer elemento que se encuentra con ese texto
 
         :param text: texto del elemento que se quiere clickear
@@ -755,7 +757,7 @@ class Driver:
 
     def select_by_index(self, by, value, index):
         """
-        Metodo para seleccionar una opcion del select utilizando \
+        Metodo para seleccionar una opcion del select utilizando 
         el indice del elemento
 
         :param by: parametro de busqueda
@@ -776,7 +778,7 @@ class Driver:
 
     def select_by_value(self, by, value, select_value):
         """
-        Metodo para seleccionar una opcion del select utlizando \
+        Metodo para seleccionar una opcion del select utlizando 
         el value de la opcion
 
         :param by: parametro de busqueda
@@ -810,11 +812,11 @@ class Driver:
 
     def get_select_options(self, by, value):
         """
-        Metodo para obtener todas las opciones dentro de un select \
+        Metodo para obtener todas las opciones dentro de un select 
         las opciones se lee con el atributo text de cada opcion
         :param by: parametro de busqueda
         :param value: nombre del elemento que se quiere buscar
-        :return: array con todas las opciones que se puede seleccionar \
+        :return: array con todas las opciones que se puede seleccionar 
                  dentro del Select
         """
         select = Select(self.__search_element(by, value))
@@ -823,7 +825,7 @@ class Driver:
     def check(self, value):
         """ Funcion para seleccionar un checkbox
 
-        :param value: nombre del checkbox que se quiere marcar, se \
+        :param value: nombre del checkbox que se quiere marcar, se 
                           busca por id
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -838,7 +840,7 @@ class Driver:
             return True
 
     def search_elem(self, by, value):
-        """ Funcion publica para que el usuario pueda buscar un \
+        """ Funcion publica para que el usuario pueda buscar un 
         elemento que se encuentre en la pagina
 
         :param by: parametro de busqueda
@@ -868,8 +870,8 @@ class Driver:
     def change_tab(self, windows_name):
         """ se utiliza para cambiar de tab
 
-        :param windows_name: nombre del tab que se quiere cambiar, hay que \
-                             utilizar el metodo tabs para obtener \
+        :param windows_name: nombre del tab que se quiere cambiar, hay que 
+                             utilizar el metodo tabs para obtener 
                              los nombres
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -883,8 +885,8 @@ class Driver:
             return True
 
     def tabs(self):
-        """ Devuelve los handle de los tabs que estan abierto, esto se \
-        devuelve en formato de array. La pos 0, es el primer tab, \
+        """ Devuelve los handle de los tabs que estan abierto, esto se 
+        devuelve en formato de array. La pos 0, es el primer tab, 
         el resto es el orden de la ultima pestana nueva
 
         :return: devuelvo las pestanas que tiene abierto el browser
@@ -894,7 +896,7 @@ class Driver:
     def new_tab(self, url='about:blank'):
         """ Abre una pestana nueva y se la deja como el tab activo
 
-        :param url: url que se quiere abrir en el nuevo tab, por defecto \
+        :param url: url que se quiere abrir en el nuevo tab, por defecto 
                     abre about:blank
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -909,7 +911,7 @@ class Driver:
     def execute_script(self, script):
         """ Se ejecuta un script en javascript
 
-        :param script: se pasa en un string el script de js que se quiere \
+        :param script: se pasa en un string el script de js que se quiere 
                        ejecutar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -931,10 +933,10 @@ class Driver:
             return True
 
     def screenshot(self, path):
-        """ Saca un screenshot de la pantalla actual de la pagina y la \
+        """ Saca un screenshot de la pantalla actual de la pagina y la 
         guarda en el path ingresado, hay que ingresar el formato
 
-        :param path: ubicacion donde se almacenara el screenshot, \
+        :param path: ubicacion donde se almacenara el screenshot, 
         se le tiene que agregar una extension de imagen
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -948,7 +950,7 @@ class Driver:
 
     def elem_screenshot(self, by, value, path):
         """
-        Metodo para capturar la pantalla completa del browser, y que \
+        Metodo para capturar la pantalla completa del browser, y que 
         contenga el elemento deseado
         :param by: metodo de busqueda
         :param value: id del elemento que se quiere capturar
@@ -974,7 +976,7 @@ class Driver:
     @staticmethod
     def __combine_image(img1, img2):
         """
-        Metodo para juntar 2 imagenes, combina en la parte inferior de \
+        Metodo para juntar 2 imagenes, combina en la parte inferior de 
         la img1
         :param img1: imagen principal
         :param img2: imagen que se le quiere adjuntar a la imagen1
@@ -1007,7 +1009,7 @@ class Driver:
     @staticmethod
     def __box_to_coordinate(box):
         """
-        Metodo para pasar las coordenadas del box en dict a un \
+        Metodo para pasar las coordenadas del box en dict a un 
         conjunto de coordenadas
 
         :param box: coordenadas en forma de dict
@@ -1021,12 +1023,12 @@ class Driver:
 
     def element_to_png(self, by, value, dirname):
         """
-        Metodo para hacer un screenshot de un elemento. \n
-        Si el elemento que se quiere capturar es mas grande que \
-        la ventana del browser \n
+        Metodo para hacer un screenshot de un elemento. 
+        Si el elemento que se quiere capturar es mas grande que 
+        la ventana del browser 
 
-        Se tiene que arreglar cuando la imagen es mas grande que la \
-        ventana, se puede utilizar el metodo set_windows_size para \
+        Se tiene que arreglar cuando la imagen es mas grande que la 
+        ventana, se puede utilizar el metodo set_windows_size para 
         achicar la ventana y poder probar
 
         :param by: parametro de busqueda
@@ -1117,7 +1119,7 @@ class Driver:
 
     def get_image(self, by, value, dirname):
         """
-        Metodo para guardar una imagen de la pagina. Almacena la imagen \
+        Metodo para guardar una imagen de la pagina. Almacena la imagen 
         si esta en base64, o si tiene un str de la ubicacion
         :param by: parametro de busqueda
         :param value: nombre del elemento que se busca
@@ -1234,7 +1236,7 @@ class Driver:
             return True
 
     def clear_all(self):
-        """ limpia todos los input y los select que se muestra en \
+        """ limpia todos los input y los select que se muestra en 
         la pagina
         :return: devuelvo un booleano, por si se pudo realizar la accion """
         elems_input = self.__search_many_elements('xpath',
@@ -1310,8 +1312,8 @@ class Driver:
             return False
 
     def back(self):
-        """ Metodo para volver una pagina atras en el historial \n
-        No se usa el metodo back, ya que este rompe el navegador, si \
+        """ Metodo para volver una pagina atras en el historial 
+        No se usa el metodo back, ya que este rompe el navegador, si 
         es que no tiene una pagina anterior, y no se puede capturar el error
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -1348,7 +1350,7 @@ class Driver:
     def set_windows_size(self, size):
         """ Metodo para cambiar el tamano de la ventana
 
-        :param size: un dict que contenga el ancho y el alto \
+        :param size: un dict que contenga el ancho y el alto 
                      de las pantallas que se quiere utilizar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
@@ -1371,7 +1373,7 @@ class Driver:
 
     def to_pdf(self, dirname, option='string'):
         """
-        Convierte la pagina actual en un pdf. Este metodo suele tardar \
+        Convierte la pagina actual en un pdf. Este metodo suele tardar 
         bastante tiempo en la conversion a pdf
         :param dirname: direccion en la que se quiere guardar el pdf
         :return: devuelvo un booleano si se pudo generar el pdf
