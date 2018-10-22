@@ -1,3 +1,4 @@
+"""Convert a website to pdf"""
 from Web_Driver import Driver
 from time import sleep
 

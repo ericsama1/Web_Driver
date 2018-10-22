@@ -1,4 +1,4 @@
-"""Metodo para obtener el logo del google"""
+"""Get Google logo from website"""
 from Web_Driver import Driver
 from time import sleep
 

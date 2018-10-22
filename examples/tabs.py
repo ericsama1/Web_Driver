@@ -1,4 +1,4 @@
-"""Create tabs and use it"""
+"""Create tabs and use them"""
 from Web_Driver import Driver
 from time import sleep
 
