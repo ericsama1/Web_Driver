@@ -561,7 +561,7 @@ class Driver:
                            return True
         return False
 
-    def compare_overlap(self, box1, box2):
+    def __compare_overlap(self, box1, box2):
         """ 
         Metodo para chequear si hay superposicion entre los 2 boxes
         :param box1, box2: dos medidas para verificar que no se 
