@@ -2,6 +2,7 @@
 from Web_Driver import Driver
 from time import sleep
 
+
 def main():
     driver = Driver(browser='firefox', incognito='True')
     driver.url('https://google.com')
