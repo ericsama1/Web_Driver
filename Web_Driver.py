@@ -694,15 +694,16 @@ class Driver:
         else:
             return False
 
-    def select_by_text(self, value, valor):
+    def select_by_text(self, by, value, valor):
         """ Seleccionar un elemento de un select, se busca por ID
-
+        
+        :param by: parametro de busqueda
         :param value: nombre del select, por lo general, se busca por id
         :param valor: el valor que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         try:
-            select = Select(self.__search_element(By.ID, value))
+            select = Select(self.__search_element(by, value))
         except (NoSuchElementException, UnexpectedTagNameException):
             # si no existe el select con el id ingresado
             self.__log_error('El select {}, no existe'.format(value))
@@ -719,14 +720,15 @@ class Driver:
                         valor, value))
                 return False
 
-    def select_random(self, value):
+    def select_random(self, by, value):
         """ seleccionar un elemento de un select aleatoriamente
 
+        :param by: parametro de busqueda
         :param value: nombre del Select que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         try:
-            select = Select(self.__search_element(By.ID, value))
+            select = Select(self.__search_element(by, value))
         except (NoSuchElementException, UnexpectedTagNameException):
             # si no se encuentra el elemento, devuelvo un False
             self.__log_error('El select {}, no existe'.format(value))
@@ -742,17 +744,18 @@ class Driver:
                              'select esta vacio')
             return False
 
-    def select_by_index(self, value, index):
+    def select_by_index(self, by, value, index):
         """
         Metodo para seleccionar una opcion del select utilizando \
         el indice del elemento
 
+        :param by: parametro de busqueda
         :param value: id del select
         :param index: indice del elemento que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         try:
-            select = Select(self.__search_element(By.ID, value))
+            select = Select(self.__search_element(by, value))
         except (NoSuchElementException, UnexpectedTagNameException):
             self.__log_error('El select {}, no existe'.format(value))
             return False
@@ -763,17 +766,18 @@ class Driver:
                             .format(valor, value))
             return True
 
-    def select_by_value(self, value, select_value):
+    def select_by_value(self, by, value, select_value):
         """
         Metodo para seleccionar una opcion del select utlizando \
         el value de la opcion
 
+        :param by: parametro de busqueda
         :param value: id del select
         :param select_value:  value del elemento que se quiere seleccionar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         try:
-            select = Select(self.__search_element(By.ID, value))
+            select = Select(self.__search_element(by, value))
         except (NoSuchElementException, UnexpectedTagNameException):
             self.__log_error('El select {}, no existe'.format(value))
             return False
