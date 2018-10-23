@@ -1,2 +1,8 @@
+*.pyc
+*.log
+*.png
+
+.vscode
+__pycache__
+
 settings_local.py
-web_driver.log
