@@ -27,7 +27,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 from constants.Browser import CHROME, FIREFOX, OPERA
-from Log import Log
+from log.Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
                       opera_binary_location)
 
