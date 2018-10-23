@@ -70,27 +70,6 @@ class Driver:
             # el menu size es los pixeles que usa la barra de direcciones,
             # el conjunto de las pestanas en firefox
             self.__menu_size = 75
-
-            # La emulacion mobile no esta disponible para firefox, solo para
-            # chrome
-            if device is not None:
-                print("{}La emulacion mobile no esta habilitada para "
-                      "firefox{}".format(Fore.RED, Fore.RESET))
-                self.__log_warning("La emulacion mobile no esta habilitada "
-                                   "para firefox")
-            # Cambiar la posicion del navegador no esta habilitado para firefox
-            if position is not None:
-                print("{}El cambio de la posicion no esta habilitada para "
-                      "firefox{}".format(Fore.RED, Fore.RESET))
-                self.__log_warning("El cambio de la posicion no esta "
-                                   "habilitada para firefox")
-            # El fullscreen del navegador no esta habilitado para firefox
-            if fullscreen:
-                print("{}El fullscreen no esta habilitada para firefox{}".
-                      format(Fore.RED, Fore.RESET))
-                self.__log_warning("El fullscreen no esta habilitada "
-                                   "para firefox")
-
             try:
                 self.__browser = webdriver.Firefox(
                     executable_path=path_firefoxdriver,
@@ -162,14 +141,6 @@ class Driver:
         elif browser == 'chrome':
             browser_options = ChromeOptions()
             self.__log_info('Se inicia la aplicacion en Chrome')
-            # si el device es None, entonces no se emula
-            if device is not None:
-                # la emulacion de mobile
-                mobile_emulation = {"deviceName": device}
-                browser_options.add_experimental_option("mobileEmulation",
-                                                        mobile_emulation)
-                self.__log_info('Se inicia con la vista del movil'
-                                ' {}'.format(device))
         elif browser == 'opera':
             self.__log_info("Se inicia la aplicacion en Opera")
             browser_options = OperaOptions()
@@ -183,6 +154,20 @@ class Driver:
                 Fore.RED, Fore.RESET))
             sys.exit(1)
 
+        # si el device es None, entonces no se emula
+        # la emulacion solo funciona en chrome
+        if device is not None:
+            if browser == 'chrome':
+                # la emulacion de mobile
+                mobile_emulation = {"deviceName": device}
+                browser_options.add_experimental_option("mobileEmulation",
+                                                        mobile_emulation)
+                self.__log_info('Se inicia con la vista del movil'
+                                ' {}'.format(device))
+            else:
+                self.__log_warning('No se puede emular un dispositivo '
+                                   'movil en {}'.format(browser))
+
         # si el flag estan en True, se abre el navegador en modo incognito
         # el argumento es diferente respecto al browser utilizado
         if incognito:
@@ -192,8 +177,13 @@ class Driver:
                 browser_options.add_argument("--private")
 
         # si el flag esta en True, se habilita el modo headless
+        # el headless no funciona como corresponde en opera
         if headless:
-            browser_options.add_argument("--headless")
+            if browser == 'opera':
+                self.__log_warning('No se puede utilizar la herramienta '
+                                   'headless para opera')
+            else:
+                browser_options.add_argument("--headless")
 
         # dejo esta opcion para que el usuario pueda ingresar a mano los
         # comandos que quiere ingresar manualmente
@@ -203,13 +193,21 @@ class Driver:
         # se puede pasar por parametro la posicion del navegador, funciona con
         # chrome
         if position is not None:
-            browser_options.add_argument('--window-position={},{}'.format(
-                position['x'], position['y']))
+            if browser == 'chrome':
+                browser_options.add_argument('--window-position={},{}'.format(
+                                                position['x'], position['y']))
+            else:
+                self.__log_warning('No se puede posicionar la ventana en {}'.
+                                   format(browser))
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
         if fullscreen:
-            browser_options.add_argument('--start-fullscreen')
+            if browser == 'chrome':
+                browser_options.add_argument('--start-fullscreen')
+            else:
+                self.__log_warning('no esta habilitado el fullscreen en {}'.
+                                   format(browser))
 
         # agrego este argumento para que se quite la barra de scroll en las
         # capturas de pantalla
