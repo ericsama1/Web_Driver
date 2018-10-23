@@ -26,6 +26,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
+from constants.Browser import CHROME, FIREFOX, OPERA
 from Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
                       opera_binary_location)
@@ -66,7 +67,7 @@ class Driver:
         browser_options = self.__set_options(browser, device, headless,
                                              incognito, commands, position,
                                              fullscreen)
-        if browser == 'firefox':
+        if browser == FIREFOX:
             # el menu size es los pixeles que usa la barra de direcciones,
             # el conjunto de las pestanas en firefox
             self.__menu_size = 75
@@ -79,7 +80,7 @@ class Driver:
                 print("{}No se pudo iniciar el driver, revisar los "
                       "parametros {}".format(Fore.RED, Fore.RESET))
                 exit(1)
-        elif browser == 'chrome':
+        elif browser == CHROME:
             if headless:
                 # si uso el headless, no tngo pixeles molestos
                 self.__menu_size = 0
@@ -97,7 +98,7 @@ class Driver:
                 print("{}No se pudo iniciar el driver, revisar los "
                       "parametros {}".format(Fore.RED, Fore.RESET))
                 exit(1)
-        elif browser == "opera":
+        elif browser == OPERA:
             try:
                 self.__browser = webdriver.Opera(
                     executable_path=path_operadriver,
@@ -112,7 +113,7 @@ class Driver:
                 self.maximize_windows()
             else:
                 self.set_windows_size(size)
-        self.__browser.implicitly_wait(0.3)  # timeout para el wait,
+        self.__browser.implicitly_wait(0.3)  # timeout para el wait
 
     def __set_options(self, browser, device, headless, incognito,
                       commands, position, fullscreen):
@@ -135,14 +136,11 @@ class Driver:
         :return: devuelvo un Options segun el navegador que utilizo
         """
         # el objeto Options varia segun el navegador
-        if browser == 'firefox':
-            self.__log_info('Se inicia la aplicacion con firefox')
+        if browser == FIREFOX:
             browser_options = FirefoxOptions()
-        elif browser == 'chrome':
+        elif browser == CHROME:
             browser_options = ChromeOptions()
-            self.__log_info('Se inicia la aplicacion en Chrome')
-        elif browser == 'opera':
-            self.__log_info("Se inicia la aplicacion en Opera")
+        elif browser == OPERA:
             browser_options = OperaOptions()
             # para hacer andar opera, hay que pasarle la direccion del
             # ejecutable de opera
@@ -153,11 +151,12 @@ class Driver:
             print('{}NO se ingreso un navegador valido{}'.format(
                 Fore.RED, Fore.RESET))
             sys.exit(1)
+        self.__log_info('Se inicia la aplicacion con {}'.format(browser))
 
         # si el device es None, entonces no se emula
         # la emulacion solo funciona en chrome
         if device is not None:
-            if browser == 'chrome':
+            if browser == CHROME:
                 # la emulacion de mobile
                 mobile_emulation = {"deviceName": device}
                 browser_options.add_experimental_option("mobileEmulation",
@@ -171,15 +170,15 @@ class Driver:
         # si el flag estan en True, se abre el navegador en modo incognito
         # el argumento es diferente respecto al browser utilizado
         if incognito:
-            if browser == 'chrome':
+            if browser == CHROME:
                 browser_options.add_argument("--incognito")
-            elif (browser == 'firefox' or browser == 'opera'):
+            elif (browser == FIREFOX or browser == OPERA):
                 browser_options.add_argument("--private")
 
         # si el flag esta en True, se habilita el modo headless
         # el headless no funciona como corresponde en opera
         if headless:
-            if browser == 'opera':
+            if browser == OPERA:
                 self.__log_warning('No se puede utilizar la herramienta '
                                    'headless para opera')
             else:
@@ -193,7 +192,7 @@ class Driver:
         # se puede pasar por parametro la posicion del navegador, funciona con
         # chrome
         if position is not None:
-            if browser == 'chrome':
+            if browser == CHROME:
                 browser_options.add_argument('--window-position={},{}'.format(
                                                 position['x'], position['y']))
             else:
@@ -203,7 +202,7 @@ class Driver:
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
         if fullscreen:
-            if browser == 'chrome':
+            if browser == CHROME:
                 browser_options.add_argument('--start-fullscreen')
             else:
                 self.__log_warning('no esta habilitado el fullscreen en {}'.
