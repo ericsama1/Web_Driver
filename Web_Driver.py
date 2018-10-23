@@ -33,7 +33,7 @@ from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
 
 
 class Driver:
-    def __init__(self, browser='chrome', device=None, headless=False,
+    def __init__(self, browser=CHROME, device=None, headless=False,
                  size=None, incognito=False, commands=None, position=None,
                  fullscreen=False
                  ):
