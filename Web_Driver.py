@@ -13,24 +13,22 @@ from colorama import Fore
 from pdfkit import from_string, from_url
 from selenium import webdriver
 from selenium.common.exceptions import (
-    NoSuchElementException,
-    ElementClickInterceptedException,
-    UnexpectedTagNameException,
-    NoSuchWindowException,
-    WebDriverException,
-    InvalidElementStateException,
-    NoAlertPresentException,
-    ElementNotSelectableException,
+    NoSuchElementException, ElementClickInterceptedException,
+    UnexpectedTagNameException, NoSuchWindowException,
+    WebDriverException, InvalidElementStateException,
+    NoAlertPresentException, ElementNotSelectableException,
     ElementNotVisibleException)
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.opera.options import Options as OperaOptions
 from selenium.webdriver.common.action_chains import ActionChains as AC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support.select import Select
 
 from Log import Log
-from settings import path_firefoxdriver, path_chromedriver
+from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
+                      opera_binary_location)
 
 
 class Driver:
@@ -120,6 +118,14 @@ class Driver:
                 print("{}No se pudo iniciar el driver, revisar los "
                       "parametros {}".format(Fore.RED, Fore.RESET))
                 exit(1)
+        elif browser == "opera":
+            try:
+                self.__browser = webdriver.Opera(
+                    executable_path=path_operadriver,
+                    options=browser_options)
+            except WebDriverException:
+                self.__log_error
+                exit(1)
         if not fullscreen:
             if size is None:
                 # si no se ingresa una medida y no se usa el headless, se
@@ -151,12 +157,8 @@ class Driver:
         """
         # el objeto Options varia segun el navegador
         if browser == 'firefox':
-            browser_options = FirefoxOptions()
             self.__log_info('Se inicia la aplicacion con firefox')
-
-            # si el flag esta en True, se habilita el modo incognito
-            if incognito:
-                browser_options.add_argument("--private")
+            browser_options = FirefoxOptions()
         elif browser == 'chrome':
             browser_options = ChromeOptions()
             self.__log_info('Se inicia la aplicacion en Chrome')
@@ -168,16 +170,26 @@ class Driver:
                                                         mobile_emulation)
                 self.__log_info('Se inicia con la vista del movil'
                                 ' {}'.format(device))
-
-            # si el flag esta en True, se habilita el modo incognito
-            if incognito:
-                browser_options.add_argument("--incognito")
+        elif browser == 'opera':
+            self.__log_info("Se inicia la aplicacion en Opera")
+            browser_options = OperaOptions()
+            # para hacer andar opera, hay que pasarle la direccion del
+            # ejecutable de opera
+            browser_options.binary_location = opera_binary_location
         else:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
             print('{}NO se ingreso un navegador valido{}'.format(
                 Fore.RED, Fore.RESET))
             sys.exit(1)
+
+        # si el flag estan en True, se abre el navegador en modo incognito
+        # el argumento es diferente respecto al browser utilizado
+        if incognito:
+            if browser == 'chrome':
+                browser_options.add_argument("--incognito")
+            elif (browser == 'firefox' or browser == 'opera'):
+                browser_options.add_argument("--private")
 
         # si el flag esta en True, se habilita el modo headless
         if headless:
@@ -192,8 +204,7 @@ class Driver:
         # chrome
         if position is not None:
             browser_options.add_argument('--window-position={},{}'.format(
-                position['x'],
-                position['y']))
+                position['x'], position['y']))
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
