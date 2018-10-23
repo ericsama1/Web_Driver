@@ -1,10 +1,11 @@
 """Use firefox browser and incognito mode"""
 from Web_Driver import Driver
 from time import sleep
+from constants.Browser import FIREFOX
 
 
 def main():
-    driver = Driver(browser='firefox', incognito='True')
+    driver = Driver(browser=FIREFOX, incognito='True')
     driver.url('https://google.com')
     sleep(1)
     driver.send_text_to_input('id', 'lst-ib', 'Hello World!')

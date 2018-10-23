@@ -1,9 +1,10 @@
 from time import sleep
 from Web_Driver import Driver
+from constants.Browser import OPERA
 
 
 def main():
-    driver = Driver(browser='opera')
+    driver = Driver(browser=OPERA)
     driver.url('https://youtube.com')
     driver.new_tab('https://google.com')
     driver.new_tab('https://facebook.com')
