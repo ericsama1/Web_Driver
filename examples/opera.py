@@ -1,6 +1,6 @@
 from time import sleep
 from Web_Driver import Driver
-from constants.Browser import OPERA
+from constants.constants import OPERA
 
 
 def main():

@@ -1,7 +1,7 @@
 """Use firefox browser and incognito mode"""
 from Web_Driver import Driver
 from time import sleep
-from constants.Browser import FIREFOX
+from constants.constants import FIREFOX
 
 
 def main():
