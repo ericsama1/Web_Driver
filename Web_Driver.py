@@ -45,7 +45,7 @@ class Driver:
                        se quiere utilizar.
         :param headless: flag para habilitar en modo headless
         :param size: tamano de la ventana del browser, utiliza un dict con
-                     'ancho' y 'alto'
+                     'width' y 'height'
         :param incognito: flag para habilitar el modo incognito
         :param commands: se puede ingresar manualmente comandos para utilizar
                          en el driver
@@ -60,8 +60,8 @@ class Driver:
         # si se usa el headless
         if headless and size is None:
             size = {
-                "ancho": 1920,
-                "alto": 1080
+                WIDTH: 1920,
+                HEIGHT: 1080
             }
         browser_options = self.__set_options(browser, device, headless,
                                              incognito, commands, position,
@@ -76,8 +76,7 @@ class Driver:
                     firefox_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los "
-                      "parametros {}".format(Fore.RED, Fore.RESET))
+                print(Fore.RED, MSJ_ERROR_DRIVER, Fore.RESET)
                 exit(1)
         elif browser == CHROME:
             if headless:
@@ -94,8 +93,7 @@ class Driver:
                     chrome_options=browser_options)
             except WebDriverException:
                 self.__log_error()
-                print("{}No se pudo iniciar el driver, revisar los "
-                      "parametros {}".format(Fore.RED, Fore.RESET))
+                print(Fore.RED, MSJ_ERROR_DRIVER, Fore.RESET)
                 exit(1)
         elif browser == OPERA:
             try:
@@ -147,10 +145,9 @@ class Driver:
         else:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
-            print('{}NO se ingreso un navegador valido{}'.format(
-                Fore.RED, Fore.RESET))
+            print(Fore.RED, MSJ_INVALID_BROWSER, Fore.RESET)
             sys.exit(1)
-        self.__log_info('Se inicia la aplicacion con {}'.format(browser))
+        self.__log_info(MSJ_BROWSER + browser)
 
         # si el device es None, entonces no se emula
         # la emulacion solo funciona en chrome
@@ -160,11 +157,9 @@ class Driver:
                 mobile_emulation = {"deviceName": device}
                 browser_options.add_experimental_option("mobileEmulation",
                                                         mobile_emulation)
-                self.__log_info('Se inicia con la vista del movil'
-                                ' {}'.format(device))
+                self.__log_info(MSJ_MOBILE_EMULATION + device)
             else:
-                self.__log_warning('No se puede emular un dispositivo '
-                                   'movil en {}'.format(browser))
+                self.__log_warning(MSJ_INVALID_EMULATION + browser)
 
         # si el flag estan en True, se abre el navegador en modo incognito
         # el argumento es diferente respecto al browser utilizado
@@ -178,8 +173,7 @@ class Driver:
         # el headless no funciona como corresponde en opera
         if headless:
             if browser == OPERA:
-                self.__log_warning('No se puede utilizar la herramienta '
-                                   'headless para opera')
+                self.__log_warning(MSJ_INVALID_HEADLESS)
             else:
                 browser_options.add_argument(HEADLESS)
 
@@ -192,11 +186,10 @@ class Driver:
         # chrome
         if position is not None:
             if browser == CHROME:
-                browser_options.add_argument('--window-position={},{}'.format(
+                browser_options.add_argument(WINDOW_POSITION.format(
                                                 position['x'], position['y']))
             else:
-                self.__log_warning('No se puede posicionar la ventana en {}'.
-                                   format(browser))
+                self.__log_warning(MSJ_INVALID_WINDOW_POSITION + browser)
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
@@ -204,8 +197,7 @@ class Driver:
             if browser == CHROME:
                 browser_options.add_argument(FULLSCREEN)
             else:
-                self.__log_warning('no esta habilitado el fullscreen en {}'.
-                                   format(browser))
+                self.__log_warning(MSJ_INVALID_FULLSCREEN + browser)
 
         # agrego este argumento para que se quite la barra de scroll en las
         # capturas de pantalla
@@ -215,12 +207,12 @@ class Driver:
     def close(self):
         """ Metodo para cerrar el navegador que se esta utilizando """
         self.__browser.quit()
-        self.__log_info('Se cierra el navegador')
+        self.__log_info(MSJ_CLOSE_BROWSER)
 
     def url(self, url):
         """ funcion para que el browser abra la url deseada """
         self.__browser.get(url=url)
-        self.__log_info('Se abre un tab con la url: "{}"'.format(url))
+        self.__log_info(MSJ_URL + url)
 
     def __search_element(self, by, value):
         """Metodo para buscar un elemento dentro de la pagina
@@ -231,13 +223,13 @@ class Driver:
         :param return: devuelve un elemento si se encuentra,
                        sino devuelve None
         """
-        self.__log_info('Se busca el elemento "{}" por {}'.format(value, by))
+        self.__log_info(MSJ_SEARCH_ELEMENT.format(value, by))
         try:
             elem = self.__browser.find_element(by, value)
+            self.__log_info(MSJ_FIND_ELEMENT)
             return elem
         except NoSuchElementException:
-            self.__log_warning('No se encuentra el elemento '
-                               '{}'.format(value))
+            self.__log_warning(MSJ_INVALID_ELEMENT + value)
             return None
 
     def search_ids(self, by, value):
@@ -258,11 +250,11 @@ class Driver:
                         format(value, by)
                         )
         if len(ids) > 1:
-            self.__log_info('se encontro varios elementos')
+            self.__log_info(MSJ_FIND_ELEMENTS)
         elif len(ids) == 1:
-            self.__log_info('se encontro el elemento')
+            self.__log_info(MSJ_FIND_ELEMENT)
         else:
-            self.__log_warning('No se encontro ningun elemento')
+            self.__log_warning(MSJ_INVALID_ELEMENT)
         return ids
 
     def __search_many_elements(self, by, value):
@@ -281,34 +273,6 @@ class Driver:
             self.__log_warning("No se encuentra ningun elemento {} con el "
                                "parametro {}".format(value, by))
         return elems
-
-    def obtener_input_texto_error(self):
-        """
-        Metodo para buscar el error, este no es generico, sirve solo para
-        el form de registro
-        """
-        try:
-            input_errores = self.__browser.find_elements(
-                XPATH, "//span[contains(@class,'error')]//ancestor::div"
-                       "[1]//child::input"
-            )
-            for error in input_errores:
-                # guardo el id del campo que muestra el error
-                id_campo_error = error.get_attribute(ID)
-                # capturo el mensaje de error del input
-                span_error = self.__browser.find_element(
-                    XPATH, "//input[@id='{}']//ancestor::div"
-                           "[1]//child::span".format(id_campo_error)
-                )
-                # guardo en el log, el campo y el mensaje de error
-                self.__log_warning('Hay errores en el campo {}, '
-                                   'con texto "{}"'.format(id_campo_error,
-                                                           span_error.text)
-                                   )
-            return True
-        except NoSuchElementException:
-            self.__log_info("No se encuentra errores")
-            return False
 
     def buscar_error(self):
         """
@@ -335,13 +299,12 @@ class Driver:
         :return: booleano si el elemento esta visible o no
         """
         elem = self.__search_element(by, value)
-        self.__log_info('Se verifica si el elemento {} esta visible'.
-                        format(value))
+        self.__log_info(MSJ_ELEMENT_IS_VISIBLE.format(value))
         if elem.is_displayed():
-            self.__log_info('El elemento esta visible')
+            self.__log_info(MSJ_IS_VISIBLE)
             return True
         else:
-            self.__log_warning('El elemento no esta visible')
+            self.__log_warning(MSJ_IS_NOT_VISIBLE)
             return False
 
     def is_enabled(self, by, value):
@@ -352,13 +315,12 @@ class Driver:
         :return: booleano si el elemento esta habilitado o no
         """
         elem = self.__search_element(by, value)
-        self.__log_info('Se verifica si el elemento {} esta habilitado'.
-                        format(value))
+        self.__log_info(MSJ_ELEMENT_IS_ENABLED.format(value))
         if elem.is_enabled():
-            self.__log_info('El elemento esta habilitado')
+            self.__log_info(MSJ_IS_ENABLED)
             return True
         else:
-            self.__log_warning('El elemento no esta habilitado')
+            self.__log_warning(MSJ_IS_NOT_ENABLED)
             return False
 
     def get_text(self, by, value):
@@ -370,7 +332,7 @@ class Driver:
         :return: devuelvo el texto que tiene el elemento
         """
         elem = self.__search_element(by, value)
-        self.__log_info('se busca el texto del elemento {}'.format(value))
+        self.__log_info(MSJ_GET_TEXT + value)
         return elem.text
 
     def __get_elements_in_element(self, by, value, class_names):
@@ -437,10 +399,8 @@ class Driver:
             # Primero reviso que los elementos se encuentren dentro del boton
             elem_box = self.get_box(by=None, value=None, elem=element)
             if not self.__compare_box(box, elem_box):
-                self.__log_warning('el elemento {} no esta dentro del '
-                                   'box {}'.format(element.get_attibute(
-                                       'class'),
-                                       value)
+                self.__log_warning(MSJ_IN_BOX.format(element.get_attibute(
+                                                        'class'), value)
                                    )
                 return False
             # una vez revisado que los elementos se encuentran dentro del
@@ -451,9 +411,8 @@ class Driver:
             aux.remove(element)
             elem_aux = self.check_overlap_element(elem_box, aux)
             if elem_aux is not None:
-                self.__log_warning('hay superposicion en el elemento {} '
-                                   'con el elemento {}'.
-                                   format(element.get_attribute('class'),
+                self.__log_warning(MSJ_OVERLAP.format(
+                                          element.get_attribute('class'),
                                           elem_aux.get_attribute('class')
                                           )
                                    )
@@ -647,19 +606,17 @@ class Driver:
         :param text: Es el texto que se le quiere ingresar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            elem = self.__search_element(by, value)
-        except NoSuchElementException:
-            self.__log_error('El elemento "{}" no existe'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
-        elem.send_keys(text)
-        if elem.get_attribute('type') == 'password':
-            # si es una contrasena, no muestro el valor en el log
-            self.__log_info('Se ingresa un valor en {}'.format(value))
         else:
-            self.__log_info('Se ingresa el valor "{}" en {}'.format(
-                text, value))
-        return True
+            elem.send_keys(text)
+            if elem.get_attribute('type') == 'password':
+                # si es una contrasena, no muestro el valor en el log
+                self.__log_info(MSJ_INPUT_PASSWORD + value)
+            else:
+                self.__log_info(MSJ_INPUT_TEXT.format(text, value))
+            return True
 
     def click(self, by, value):
         """
@@ -669,19 +626,16 @@ class Driver:
         :param value: nombre del elemento que se quiere buscar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            elem = self.__search_element(by, value)
-            if self.is_enabled(by, value):
-                elem.click()
-        except ElementClickInterceptedException:
-            self.__log_error('El elemento no se puede clickear')
-            return False
-        except ElementNotVisibleException:
-            self.__log_error('Elemento no visible')
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
-            self.__log_info('Se clickea el elemento {}'.format(value))
-            return True
+            if elem.is_enabled():
+                elem.click()
+                self.__log_info(MSJ_CLICK + value)
+                return True
+            else:
+                return False
 
     def click_by_text(self, text, tagname='*'):
         """
@@ -693,19 +647,20 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         xpath = '//{}[contains(text(),"{}")]'.format(tagname, text)
-        varios = self.__search_many_elements('xpath', xpath)
+        varios = self.__search_many_elements(XPATH, xpath)
         if len(varios) > 1:
-            self.__log_info("Se encontraron varios elementos con el texto"
-                            "{}".format(text))
-            # se hace click sobre el primer elemento
-            varios[0].click()
-            return True
+            self.__log_info(MSJ_FIND_MANY_BTN_TEXT + text)
         elif len(varios) == 1:
-            self.__log_info("Se encontro un solo elemento con el texto"
-                            "{}".format(text))
-            return True
+            self.__log_info(MSJ_FIND_BTN_TEXT + text)
         else:
+            # Si no se encuentra ningun boton con el texto
             return False
+    
+        # Si se encuentra por lo menos 1 elemento, se hace click sobre
+        # el primer elemento
+        varios[0].click()
+        self.__log_info(MSJ_CLICK)
+        return True
 
     def __select_opction(self, by, value, texto):
         """Metodo para seleccionar una opcion del select
@@ -716,8 +671,7 @@ class Driver:
         # uso el visible text, ya que si no se muestra el texto, no
         # tiene sentido el uso del select
         select.select_by_visible_text(texto)
-        self.__log_info("Se selecciona el valor {} en el select "
-                        "{}".format(texto, value))
+        self.__log_info(MSJ_SELECT_OPTION.format(texto, value))
 
     def select_by_text(self, by, value, valor):
         """ Seleccionar un elemento de un select, se busca por ID
@@ -744,8 +698,7 @@ class Driver:
                 return True
             # Si no esta, devuelvo un False y lo escribo en el log
             else:
-                self.__log_warning("No existe la opcion {} en el select"
-                                   "{}".format(valor, value))
+                self.__log_warning(MSJ_INVALID_OPTION.format(valor, value))
                 return False
 
     def select_random(self, by, value):
@@ -840,14 +793,12 @@ class Driver:
                           busca por id
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            self.__search_element(ID, value).send_keys(Keys.SPACE)
-        except NoSuchElementException:
-            self.__log_error('No se encuentra el elemento {}'.format(value))
+        elem = self.__search_element(ID, value)
+        if elem is None:
             return False
         else:
-            # si enceuntro el checkbox, lo marco
-            self.__log_info('Se marca el checkbox {}'.format(value))
+            elem.send_keys(Keys.SPACE)
+            self.__log_info(MSJ_CHECKBOX)
             return True
 
     def search_elem(self, by, value):
@@ -870,12 +821,12 @@ class Driver:
         :param value: nombre del elemento que se busca
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            self.__search_element(by, value).send_keys(Keys.ENTER)
-        except NoSuchElementException:
-            self.__log_error('No se encuentra el elemento {}'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
+            elem.send_keys(Keys.ENTER)
+            self.__log_info(MSJ_SEND_ENTER)
             return True
 
     def change_tab(self, windows_name):
@@ -889,10 +840,10 @@ class Driver:
         try:
             self.__browser.switch_to.window(windows_name)
         except NoSuchWindowException:
-            self.__log_error('El tab que se quiere seleccionar, no existe')
+            self.__log_error(MSJ_INVALID_TAB)
             return False
         else:
-            self.__log_info('Se cambia el tab activo')
+            self.__log_info(MSJ_CHANGE_TAB)
             return True
 
     def tabs(self):
@@ -911,8 +862,7 @@ class Driver:
                     abre about:blank
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        self.__log_info('Se va a abrir un nuevo tab con la url: "{}"'.
-                        format(url))
+        self.__log_info(MSJ_NEW_TAB.format(url))
         script = NEW_TAB.format(url)
         self.execute_script(script)
         tabs = self.tabs()
@@ -927,7 +877,7 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         self.__browser.execute_script(script)
-        self.__log_info('Se ejecuta el scipt {}'.format(script))
+        self.__log_info(MSJ_EXECUTE_SCRIPT + script)
         return True
 
     def close_tab(self):
@@ -936,9 +886,9 @@ class Driver:
         try:
             self.__browser.close()
             self.change_tab(self.tabs()[0])
-            self.__log_info('Se cierra el tab actual')
+            self.__log_info(MSJ_CLOSE_TAB)
         except WebDriverException:
-            self.__log_error('No hay ningun tab abierto para seleccionar')
+            self.__log_error(MSJ_INVALID_CLOSE_TAB)
             return False
         else:
             return True
@@ -955,8 +905,7 @@ class Driver:
             self.__browser.save_screenshot(path)
         else:
             self.__browser.save_screenshot('{}.png'.format(path))
-        self.__log_info('Se hace una captura de pantalla y se guarda en el '
-                        'path  {}'.format(path))
+        self.__log_info(MSJ_SAVE_SCREENSHOT + path)
         return True
 
     def elem_screenshot(self, by, value, path):
@@ -980,8 +929,7 @@ class Driver:
                 self.__browser.save_screenshot(path)
             else:
                 self.__browser.save_screenshot('{}.png'.format(path))
-            self.__log_info('Se hace una captura de pantalla del elemento'
-                            '{} en el path {}'.format(value, path))
+            self.__log_info(MSJ_ELEMENT_SCREENSHOT.format(value, path))
             return True
 
     @staticmethod
@@ -1047,11 +995,10 @@ class Driver:
         :param dirname: ruta donde se guarda la imagen
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        if self.__search_element(by, value) is not None:
+        elem = self.__search_element(by, value)
+        if elem is not None:
             self.mouse_over(by, value)  # dejo el cursor sobre el elemento
         else:
-            # si la busqueda devuelve un None
-            self.__log_error('No se encontro el elemento {}'.format(value))
             return False
         # Capturo la imagen de toda la pantalla
         img = self.__capturar_pantalla()
@@ -1059,9 +1006,8 @@ class Driver:
         # busco las coordenadas del box que se quiere capturar la pantalla
         box = self.get_box(by, value)
         if not self.__validate_box(box):
-            self.__log_warning('La medida del box ingresado no son validos')
-            print('{}La medida del box ingresado no son validos{}'.format(
-                Fore.RED, Fore.RESET))
+            self.__log_warning(MSJ_INVALID_BOX_SIZE)
+            print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
             sys.exit(1)
         altura = box[BOTTON] - box[TOP]
         browser_size = self.get_windows_size()
@@ -1078,10 +1024,8 @@ class Driver:
                        RIGHT: box[RIGHT],
                        BOTTON: browser_size[HEIGHT]}
             if not self.__validate_box(box_aux):
-                self.__log_warning(
-                    'La medida del box ingresado no son validos')
-                print('{}La medida del box ingresado no son validos{}'.
-                      format(Fore.RED, Fore.RESET))
+                self.__log_warning(MSJ_INVALID_BOX_SIZE)
+                print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
                 sys.exit(1)
             img = img.crop(self.__box_to_coordinate(box_aux))
             # verifico que no sea la ultima pantalla
@@ -1094,10 +1038,8 @@ class Driver:
                            RIGHT: box[RIGHT],
                            BOTTON: browser_size[HEIGHT]}
                 if not self.__validate_box(box_aux):
-                    self.__log_warning('La medida del box ingresado no '
-                                       'son validos')
-                    print('{}La medida del box ingresado no son validos{}'.
-                          format(Fore.RED, Fore.RESET))
+                    self.__log_warning(MSJ_INVALID_BOX_SIZE)
+                    print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
                     sys.exit(1)
                 img2 = img2.crop(self.__box_to_coordinate(box_aux))
                 img = self.__combine_image(img, img2)
@@ -1124,8 +1066,7 @@ class Driver:
         if '.png' not in dirname:
             dirname = dirname + '.png'
         img.save(dirname)  # guardo la imagen en el path
-        self.__log_info('Se hace una captura de pantalla del elemento {}'
-                        'en el path {}'.format(value, dirname))
+        self.__log_info(MSJ_ELEMENT_SCREENSHOT.format(value, dirname))
         return True
 
     def get_image(self, by, value, dirname):
@@ -1152,42 +1093,33 @@ class Driver:
                 # save to a file
                 urlretrieve(source, dirname)
             img = Image.open(dirname)
-            self.__log_info("Se encontro el elemento {} y se guardo en {}".
-                            format(value, dirname))
+            self.__log_info(MSJ_GET_IMAGE.format(value, dirname))
             return img
         except NoSuchElementException:
-            self.__log_error("No se encuentra el elemento para "
-                             "guardar la img")
+            self.__log_error(MSJ_INVALID_IMAGE)
             return None
 
     def mouse_over(self, by, value):
         """ Mueve el mouse sobre el elemento buscado
         :return: devuelvo un booleano, por si se pudo realizar la accion"""
-        try:
-            elem = self.__search_element(by, value)
-        except NoSuchElementException:
-            self.__log_error('No existe el elemento {}'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
             mover = AC(self.__browser).move_to_element(elem)
             mover.perform()
-            self.__log_info(
-                'Se posiciona el mouse sobre el elemento {}'.format(
-                    value))
+            self.__log_info(MSJ_MOUSE_OVER + value)
             return True
 
     def double_click(self, by, value):
         """ Hace doble click en el elemento
         :return: devuelvo un booleano, por si se pudo realizar la accion"""
-        try:
-            elem = self.__search_element(by, value)
-        except NoSuchElementException:
-            self.__log_error('No se encuentra el elemento {}'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
             AC(self.__browser).double_click(elem)
-            self.__log_info('Se hace doble click sobre el elemento {}'.format(
-                value))
+            self.__log_info(MSJ_DOUBLE_CLICK + value)
             return True
 
     def mouse_scroll(self, by, value, horizontal, vertical):
@@ -1215,16 +1147,14 @@ class Driver:
         :param attribute: nombre del atributo que se quiere obtener
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            elem = self.__search_element(by, value)
-        except NoSuchElementException:
-            self.__log_error('No se encuentra el elemento {}'.format(value))
-            return None
+        elem = self.__search_element(by, value)
+        if elem is None:
+            return False
         else:
             atributo = elem.get_attribute(attribute)
             # si atributo es nulo, es porque no existe el atributo ingresado
             if atributo is None:
-                self.__log_warning('El atributo no existe')
+                self.__log_warning(MSJ_INVALID_ATTRIBUTE)
             return atributo
 
     def clear(self, by, value):
@@ -1234,16 +1164,13 @@ class Driver:
         :param value: nombre del elemento que se busca
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            elem = self.__search_element(by, value)
-        except (NoSuchElementException, InvalidElementStateException):
-            self.__log_error('No se encuentra el elemento {}'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
             # si se encuentra el elemento, sigo
             elem.clear()
-            self.__log_info('Se limpia el input del elemento {}'.format(
-                value))
+            self.__log_info(MSJ_CLEAR + value)
             return True
 
     def clear_all(self):
@@ -1256,8 +1183,7 @@ class Driver:
         elems_select = self.__search_many_elements((XPATH), '//select')
         for elem in elems_input:
             if not elem.clear():
-                self.__log_error('No se pudo borrar el elemento {}'.format(
-                    elem.get_attribute(ID)))
+                self.__log_error(MSJ_CANT_CLEAR + elem.get_attribute(ID))
         for elem in elems_select:
             select = Select(elem)
             select.select_by_index(0)  # En la pos 0, es la opcion en blanco
@@ -1269,11 +1195,11 @@ class Driver:
         try:
             alert = self.__browser.switch_to.alert
             alert.accept()
-            self.__log_info('Se confirma la alerta')
+            self.__log_info(MSJ_CONFIRM_ALERT)
             return True
         # si no se encuentra el alert devuelvo falso
         except NoAlertPresentException:
-            self.__log_error('No se presenta la alerta')
+            self.__log_error(MSJ_INVALID_ALERT)
             return False
 
     def alert_dismmis(self):
@@ -1282,11 +1208,11 @@ class Driver:
         try:
             alert = self.__browser.switch_to.alert
             alert.dismiss()
-            self.__log_info('Se rechaza la alerta')
+            self.__log_info(MSJ_REJECT_ALERT)
             return True
         # si no se encuentra el alert devuelvo falso
         except NoAlertPresentException:
-            self.__log_error('No se presenta la alerta')
+            self.__log_error(MSJ_INVALID_ALERT)
             return False
 
     def input_alert(self, text):
@@ -1298,11 +1224,11 @@ class Driver:
         try:
             alert = self.__browser.switch_to.alert
             alert.send_keys(text)
-            self.__log_info('Se ingresa el valor {} en la alerta'.format(text))
+            self.__log_info(MSJ_INPUT_ALERT.format(text))
             return True
         # si no se encuentra el alert devuelvo falso
         except (NoAlertPresentException, ElementNotSelectableException):
-            self.__log_error('No se muestra la alerta')
+            self.__log_error(MSJ_INVALID_ALERT)
             return False
 
     def back(self):
@@ -1348,10 +1274,9 @@ class Driver:
                      de las pantallas que se quiere utilizar
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        self.__browser.set_window_size(size['ancho'], size['alto'])
-        self.__log_info('Se establece el tamano de la pantalla a '
-                        '{}x{}'.format(size['ancho'],
-                                       size['alto']))
+        self.__browser.set_window_size(size[WIDTH], size[HEIGHT])
+        self.__log_info(MSJ_SET_WINDOW_SIZE.format(size[WIDTH],
+                                                   size[HEIGHT]))
         return True
 
     def get_windows_size(self):
@@ -1362,10 +1287,10 @@ class Driver:
         """ Metodo para maximizar la ventana
         :return: devuelvo un booleano, por si se pudo realizar la accion"""
         self.__browser.maximize_window()
-        self.__log_info('Se maximiza la ventana')
+        self.__log_info(MSJ_MAXIMIZE_WINDOW)
         return True
 
-    def to_pdf(self, dirname, option='string'):
+    def to_pdf(self, dirname, option=STRING):
         """
         Convierte la pagina actual en un pdf. Este metodo suele tardar
         bastante tiempo en la conversion a pdf
@@ -1379,32 +1304,28 @@ class Driver:
         # si se ingresa con la opcion de string, se genera el pdf desde
         # el string del html. Tener en cuenta que este procedimiento
         # no guarda en el pdf las imagenes
-        if option == 'string':
+        if option == STRING:
             try:
                 from_string(self.get_html(), dirname, options=pdf_option)
-                self.__log_info("Se crea el pdf de la pagina en la ubicacion"
-                                "{}".format(dirname))
+                self.__log_info(MSJ_PDF + dirname)
                 return True
             except OSError:
-                print('{}Ocurrio un error en la conversion a pdf, '
-                      'revisar el log{}'.format(Fore.RED, Fore.RESET))
+                print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
                 self.__log_error()
                 return False
         # si se ingresa con la opcion de url, se genera el pdf desde la url
         # de la pagina.
-        elif option == 'url':
+        elif option == URL:
             try:
                 from_url(self.get_url(), dirname, options=pdf_option)
-                self.__log_info("Se crea el pdf de la pagina en la ubicacion"
-                                "{}".format(dirname))
+                self.__log_info(MSJ_PDF + dirname)
                 return True
             except OSError:
-                print('{}Ocurrio un error en la conversion a pdf, '
-                      'revisar el log{}'.format(Fore.RED, Fore.RESET))
+                print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
                 self.__log_error()
                 return False
         else:
-            self.__log_warning("No se ingreso una opcion valida")
+            self.__log_warning(MSJ_INVALID_OPTION)
             return False
 
     def get_html(self):
@@ -1412,9 +1333,9 @@ class Driver:
         Metodo para obtener el codigo html de la pagina web
         :return: devuelvo el string del html de la pagina web
         """
-        elem = self.__browser.find_element('xpath', '//*')
+        elem = self.__browser.find_element(XPATH, '//*')
         source_code = elem.get_attribute('outerHTML')
-        self.__log_info("Se obtiene el codigo html de la pagina")
+        self.__log_info(MSJ_GET_HTML)
         return source_code
 
     def get_url(self):
@@ -1422,5 +1343,5 @@ class Driver:
         Metodo para obtener la url actual
         :return: devuelvo el string con la url actual
         """
-        self.__log_info("Se obtiene la url actual del navegador")
+        self.__log_info(MSJ_GET_URL)
         return self.__browser.current_url
