@@ -26,7 +26,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
-from constants.Browser import CHROME, FIREFOX, OPERA
+from constants.constants import CHROME, FIREFOX, OPERA
 from log.Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
                       opera_binary_location)
@@ -255,7 +255,6 @@ class Driver:
         for elem in elems:
             if elem.is_displayed():
                 ids.append(elem.get_attribute('id'))
-        # ids = [elem.get_attribute('id') for elem in elems]
         self.__log_info('se buscan los elementos {} con el parametro {}'.
                         format(value, by)
                         )
@@ -1289,23 +1288,6 @@ class Driver:
         # si no se encuentra el alert devuelvo falso
         except NoAlertPresentException:
             self.__log_error('No se presenta la alerta')
-            return False
-
-    def authenticate_alert(self, user, password):
-        """ se ingresa el usuario y la contrasena en la alerta
-
-        :param user: nombre del usuario
-        :param password: password del usuario
-        :return: devuelvo un booleano, por si se pudo realizar la accion
-        """
-        try:
-            alert = self.__browser.switch_to.alert
-            alert.authenticate(user, password)
-            self.__log_info("Se ingresa los datos del usuario {} en el "
-                            "alert".format(user))
-            return True
-        # si no se encuentra el alert devuelvo falso
-        except NoAlertPresentException:
             return False
 
     def input_alert(self, text):
