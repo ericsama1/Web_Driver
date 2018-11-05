@@ -22,11 +22,10 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.opera.options import Options as OperaOptions
 from selenium.webdriver.common.action_chains import ActionChains as AC
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
-from constants.constants import CHROME, FIREFOX, OPERA
+from constants.constants import *
 from log.Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
                       opera_binary_location)
@@ -55,7 +54,7 @@ class Driver:
         :param fullscreen: flag para habilitar el modo fullscreen, solo
                            funciona con chrome
         """
-        self.__log = Log('web_driver.log')  # se crea un log en la ubicacion
+        self.__log = Log(LOG_FILE)  # se crea un log en la ubicacion
         self.__menu_size = 0
         # se deja 1920x1080 como tamano por defecto de las pantallas
         # si se usa el headless
@@ -171,9 +170,9 @@ class Driver:
         # el argumento es diferente respecto al browser utilizado
         if incognito:
             if browser == CHROME:
-                browser_options.add_argument("--incognito")
+                browser_options.add_argument(INCOGNITO)
             elif (browser == FIREFOX or browser == OPERA):
-                browser_options.add_argument("--private")
+                browser_options.add_argument(PRIVATE)
 
         # si el flag esta en True, se habilita el modo headless
         # el headless no funciona como corresponde en opera
@@ -182,7 +181,7 @@ class Driver:
                 self.__log_warning('No se puede utilizar la herramienta '
                                    'headless para opera')
             else:
-                browser_options.add_argument("--headless")
+                browser_options.add_argument(HEADLESS)
 
         # dejo esta opcion para que el usuario pueda ingresar a mano los
         # comandos que quiere ingresar manualmente
@@ -203,14 +202,14 @@ class Driver:
         # fullscreen, solo funciona en chrome
         if fullscreen:
             if browser == CHROME:
-                browser_options.add_argument('--start-fullscreen')
+                browser_options.add_argument(FULLSCREEN)
             else:
                 self.__log_warning('no esta habilitado el fullscreen en {}'.
                                    format(browser))
 
         # agrego este argumento para que se quite la barra de scroll en las
         # capturas de pantalla
-        browser_options.add_argument('--hide-scrollbar')
+        browser_options.add_argument(HIDE_SCROLLBAR)
         return browser_options
 
     def close(self):
@@ -254,7 +253,7 @@ class Driver:
         ids = []
         for elem in elems:
             if elem.is_displayed():
-                ids.append(elem.get_attribute('id'))
+                ids.append(elem.get_attribute(ID))
         self.__log_info('se buscan los elementos {} con el parametro {}'.
                         format(value, by)
                         )
@@ -290,16 +289,16 @@ class Driver:
         """
         try:
             input_errores = self.__browser.find_elements(
-                By.XPATH, "//span[contains(@class,'error')]//ancestor::div"
-                          "[1]//child::input"
+                XPATH, "//span[contains(@class,'error')]//ancestor::div"
+                       "[1]//child::input"
             )
             for error in input_errores:
                 # guardo el id del campo que muestra el error
-                id_campo_error = error.get_attribute('id')
+                id_campo_error = error.get_attribute(ID)
                 # capturo el mensaje de error del input
                 span_error = self.__browser.find_element(
-                    By.XPATH, "//input[@id='{}']//ancestor::div"
-                              "[1]//child::span".format(id_campo_error)
+                    XPATH, "//input[@id='{}']//ancestor::div"
+                           "[1]//child::span".format(id_campo_error)
                 )
                 # guardo en el log, el campo y el mensaje de error
                 self.__log_warning('Hay errores en el campo {}, '
@@ -391,7 +390,7 @@ class Driver:
         for name in class_names:
             try:
                 # busco por nombre de clase dentro del elemento
-                elem_interno = elem.find_element(By.CLASS_NAME, name)
+                elem_interno = elem.find_element(CLASS_NAME, name)
                 # si el elemento se muestra, lo guardo en la lista
                 if elem_interno.is_displayed():
                     elements.append(elem_interno)
@@ -411,13 +410,13 @@ class Driver:
         :return: devuelvo True si el box2 esta dentro del box1
                  devuelvo False si el box2 NO est dentro del box1
         """
-        if box1['botton'] <= box2['botton']:
+        if box1[BOTTON] <= box2[BOTTON]:
             return False
-        if box1['top'] >= box2['top']:
+        if box1[TOP] >= box2[TOP]:
             return False
-        if box1['right'] <= box2['right']:
+        if box1[RIGHT] <= box2[RIGHT]:
             return False
-        if box1['left'] >= box2['left']:
+        if box1[LEFT] >= box2[LEFT]:
             return False
         return True
 
@@ -472,27 +471,27 @@ class Driver:
         """
         # si la direccion no es abajo, reviso si la parte inferior
         # del box1 se superpone con el box2
-        if filtro != 'botton':
-            if (not(box1['botton'] >= box2['top'] and
-                    box1['botton'] <= box2['botton'])):
+        if filtro != BOTTON:
+            if (not(box1[BOTTON] >= box2[TOP] and
+                    box1[BOTTON] <= box2[BOTTON])):
                 return False
         # si la direccion no es arriba, reviso si la parte superior
         # del box1 se superpone con el box2
-        if filtro != 'top':
-            if (not(box1['top'] >= box2['top'] and
-                    box1['top'] <= box2['botton'])):
+        if filtro != TOP:
+            if (not(box1[TOP] >= box2[TOP] and
+                    box1[TOP] <= box2[BOTTON])):
                 return False
         # si la direccion no es la izquierda, reviso si la parte izquierda
         # del box1 se superpone con el box2
-        if filtro != 'left':
-            if (not(box1['left'] >= box2['left'] and
-                    box1['left'] <= box2['right'])):
+        if filtro != LEFT:
+            if (not(box1[LEFT] >= box2[LEFT] and
+                    box1[LEFT] <= box2[RIGHT])):
                 return False
         # si la direccion no es derecha, reviso si la parte inferior
         # del box1 se superpone con el box2
-        if filtro != 'right':
-            if (not(box1['right'] >= box2['left'] and
-                    box1['right'] <= box2['right'])):
+        if filtro != RIGHT:
+            if (not(box1[RIGHT] >= box2[LEFT] and
+                    box1[RIGHT] <= box2[RIGHT])):
                 return False
         return True
 
@@ -505,21 +504,21 @@ class Driver:
                  devuelvo False si NO hay superposicion
         """
         # me fijo si el box1 esta en la parte superior del box2
-        if box2['top'] >= box1['top'] and box2['top'] <= box1['botton']:
-            if self.__check_lateral(box1, box2, "top"):
+        if box2[TOP] >= box1[TOP] and box2[TOP] <= box1[BOTTON]:
+            if self.__check_lateral(box1, box2, TOP):
                 return True
         # me fijo si el box1 esta en la parte derecha del box2
-        elif box2['right'] >= box1['left'] and box2['right'] <= box1['right']:
-            if self.__check_lateral(box1, box2, "right"):
+        elif box2[RIGHT] >= box1[LEFT] and box2[RIGHT] <= box1[RIGHT]:
+            if self.__check_lateral(box1, box2, RIGHT):
                 return True
         # me fijo si el box1 esta en la parte inferior del box2
-        elif (box2['botton'] >= box1['top'] and
-              box2['botton'] <= box1['botton']):
-            if self.__check_lateral(box1, box2, "botton"):
+        elif (box2[BOTTON] >= box1[TOP] and
+              box2[BOTTON] <= box1[BOTTON]):
+            if self.__check_lateral(box1, box2, BOTTON):
                 return True
         # me fijo si el box1 esta en la parte izquierda del box2
-        elif box2['left'] >= box1['left'] and box2['left'] <= box1['right']:
-            if self.__check_lateral(box1, box2, "left"):
+        elif box2[LEFT] >= box1[LEFT] and box2[LEFT] <= box1[RIGHT]:
+            if self.__check_lateral(box1, box2, LEFT):
                 return True
         else:
             return False
@@ -536,27 +535,27 @@ class Driver:
         """
         # pregunto por el area superior de la superposicion entre los
         # boxes
-        area_top = (box2['top'] >= box1['top'] and
-                    box2['top'] <= box1['botton'])
+        area_top = (box2[TOP] >= box1[TOP] and
+                    box2[TOP] <= box1[BOTTON])
         # verifico que el area inferior de la superposicion se encuentre
         # dentro de los boxes
-        area_botton = (box1['botton'] >= box2['top'] and
-                       box1['botton'] <= box2['botton'])
+        area_botton = (box1[BOTTON] >= box2[TOP] and
+                       box1[BOTTON] <= box2[BOTTON])
         if area_top:
             if area_botton:
                 # pregunto si el box1 se encuentra mas a la derecha que
                 # el box2
-                if (box2['right'] >= box1['left']and
-                        box2['right'] <= box1['right']):
-                    if (box2['left'] >= box1['left'] and
-                            box2['left'] <= box1['right']):
+                if (box2[RIGHT] >= box1[LEFT]and
+                        box2[RIGHT] <= box1[RIGHT]):
+                    if (box2[LEFT] >= box1[LEFT] and
+                            box2[LEFT] <= box1[RIGHT]):
                         return True
                 # si el box1 esta mas a la izquierda que el box2, paso
                 # por aca
-                elif (box1['right'] >= box2['left'] and
-                        box1['right'] <= box2['right']):
-                    if (box2['left'] >= box1['left'] and
-                            box2['left'] <= box1['right']):
+                elif (box1[RIGHT] >= box2[LEFT] and
+                        box1[RIGHT] <= box2[RIGHT]):
+                    if (box2[LEFT] >= box1[LEFT] and
+                            box2[LEFT] <= box1[RIGHT]):
                         return True
         return False
 
@@ -610,12 +609,12 @@ class Driver:
         posicion = elem.location  # obtengo la posicion del elemento
         left = posicion['x']
         top = posicion['y']
-        right = left + tamano['width']
-        botton = top + tamano['height']
-        box = {"left": left,
-               "top": top,
-               "right": right,
-               "botton": botton}  # creo un box con las coordenadas
+        right = left + tamano[WIDTH]
+        botton = top + tamano[HEIGHT]
+        box = {LEFT: left,
+               TOP: top,
+               RIGHT: right,
+               BOTTON: botton}  # creo un box con las coordenadas
         return box
 
     def get_size(self, by, value):
@@ -842,7 +841,7 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         try:
-            self.__search_element(By.ID, value).send_keys(Keys.SPACE)
+            self.__search_element(ID, value).send_keys(Keys.SPACE)
         except NoSuchElementException:
             self.__log_error('No se encuentra el elemento {}'.format(value))
             return False
@@ -914,7 +913,7 @@ class Driver:
         """
         self.__log_info('Se va a abrir un nuevo tab con la url: "{}"'.
                         format(url))
-        script = "window.open('{}');".format(url)
+        script = NEW_TAB.format(url)
         self.execute_script(script)
         tabs = self.tabs()
         self.change_tab(tabs[len(tabs) - 1])  # Cambio el tab activo
@@ -1011,9 +1010,9 @@ class Driver:
         :param box: box con 4 medidas, left, top, right, botton
         :return: booleano para validar medidas del box
         """
-        if box['left'] > box['right']:
+        if box[LEFT] > box[RIGHT]:
             return False
-        elif box['top'] > box['botton']:
+        elif box[TOP] > box[BOTTON]:
             return False
         else:
             return True
@@ -1027,10 +1026,10 @@ class Driver:
         :param box: coordenadas en forma de dict
         :return: conjunto de coordenadas para usar en el crop
         """
-        box_aux = (box['left'],
-                   box['top'],
-                   box['right'],
-                   box['botton'])
+        box_aux = (box[LEFT],
+                   box[TOP],
+                   box[RIGHT],
+                   box[BOTTON])
         return box_aux
 
     def element_to_png(self, by, value, dirname):
@@ -1064,20 +1063,20 @@ class Driver:
             print('{}La medida del box ingresado no son validos{}'.format(
                 Fore.RED, Fore.RESET))
             sys.exit(1)
-        altura = box['botton'] - box['top']
+        altura = box[BOTTON] - box[TOP]
         browser_size = self.get_windows_size()
-        browser_size['height'] -= self.__menu_size
+        browser_size[HEIGHT] -= self.__menu_size
 
         # me fijo si el elemento es mas grande que la pantalla
         # del browser
-        if browser_size['height'] < altura:
+        if browser_size[HEIGHT] < altura:
             # scroll es la cantidad de pixeles que quiero mover
 
-            scroll = browser_size['height']
-            box_aux = {'left': box['left'],
-                       'top': box['top'],
-                       'right': box['right'],
-                       'botton': browser_size['height']}
+            scroll = browser_size[HEIGHT]
+            box_aux = {LEFT: box[LEFT],
+                       TOP: box[TOP],
+                       RIGHT: box[RIGHT],
+                       BOTTON: browser_size[HEIGHT]}
             if not self.__validate_box(box_aux):
                 self.__log_warning(
                     'La medida del box ingresado no son validos')
@@ -1086,14 +1085,14 @@ class Driver:
                 sys.exit(1)
             img = img.crop(self.__box_to_coordinate(box_aux))
             # verifico que no sea la ultima pantalla
-            while altura > scroll + browser_size['height']:
+            while altura > scroll + browser_size[HEIGHT]:
                 # utilizo el metodo para desplazar X cantidad de pixeles
                 self.mouse_scroll(by, value, 0, scroll)
                 img2 = self.__capturar_pantalla()
-                box_aux = {'left': box['left'],
-                           'top': 0,
-                           'right': box['right'],
-                           'botton': browser_size['height']}
+                box_aux = {LEFT: box[LEFT],
+                           TOP: 0,
+                           RIGHT: box[RIGHT],
+                           BOTTON: browser_size[HEIGHT]}
                 if not self.__validate_box(box_aux):
                     self.__log_warning('La medida del box ingresado no '
                                        'son validos')
@@ -1102,15 +1101,15 @@ class Driver:
                     sys.exit(1)
                 img2 = img2.crop(self.__box_to_coordinate(box_aux))
                 img = self.__combine_image(img, img2)
-                scroll += browser_size['height']
+                scroll += browser_size[HEIGHT]
 
             # capturar el ultimo pedacito de la pagina
             self.mouse_scroll(by, value, 0, scroll)
             top = altura - scroll  # pixeles que faltan capturar
             # de la ultima pantalla, capturo solo los pixeles que necesito
-            top = browser_size['height'] - top
+            top = browser_size[HEIGHT] - top
             # creo un box con las coordenadas
-            box = (box['left'], top, box['right'], browser_size['height'])
+            box = (box[LEFT], top, box[RIGHT], browser_size[HEIGHT])
             img_aux = self.__capturar_pantalla()
             # corto de la pantalla, el pedacito que necesito
             img_aux = img_aux.crop(box)
@@ -1118,8 +1117,8 @@ class Driver:
             img = self.__combine_image(img, img_aux)
         else:
             # si esta dentro de la ventana del navegador, creo un box
-            box_aux = (box['left'], box['top'], box['right'],
-                       box['botton'])
+            box_aux = (box[LEFT], box[TOP], box[RIGHT],
+                       box[BOTTON])
             # recorto la imagen en las coordenadas que paso en el box
             img = img.crop(box_aux)
         if '.png' not in dirname:
@@ -1202,7 +1201,7 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         if self.mouse_over(by, value):
-            self.__browser.execute_script("scrollTo({},{});".format(
+            self.__browser.execute_script(SCROLL.format(
                 horizontal, vertical))
             return True
         else:
@@ -1251,14 +1250,14 @@ class Driver:
         """ limpia todos los input y los select que se muestra en
         la pagina
         :return: devuelvo un booleano, por si se pudo realizar la accion """
-        elems_input = self.__search_many_elements('xpath',
+        elems_input = self.__search_many_elements(XPATH,
                                                   '//input[starts-with('
                                                   '@id,"id")]')
-        elems_select = self.__search_many_elements('xpath', '//select')
+        elems_select = self.__search_many_elements((XPATH), '//select')
         for elem in elems_input:
             if not elem.clear():
                 self.__log_error('No se pudo borrar el elemento {}'.format(
-                    elem.get_attribute('id')))
+                    elem.get_attribute(ID)))
         for elem in elems_select:
             select = Select(elem)
             select.select_by_index(0)  # En la pos 0, es la opcion en blanco
@@ -1312,7 +1311,7 @@ class Driver:
         es que no tiene una pagina anterior, y no se puede capturar el error
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        self.__browser.execute_script("window.history.go(-1)")
+        self.__browser.execute_script(BACK)
         return True
 
     def forward(self):
