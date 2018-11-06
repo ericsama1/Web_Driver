@@ -19,6 +19,10 @@ FULLSCREEN = '--start-fullscreen'
 HIDE_SCROLLBAR = '--hide-scrollbar'
 WINDOW_POSITION = '--window-position={},{}'
 
+# Device Emulation
+DEVICE_NAME = 'deviceName'
+MOBILE_EMULATION = 'mobileEmulation'
+
 # Direction
 TOP = 'top'
 BOTTON = 'botton'
@@ -26,6 +30,8 @@ LEFT = 'left'
 RIGHT = 'right'
 HEIGHT = 'height'
 WIDTH = 'width'
+X = 'x'
+Y = 'y'
 
 # Log
 LOG_FILE = 'web_driver.log'
@@ -44,3 +50,13 @@ CLASS_NAME = By.CLASS_NAME
 STRING = 'string'
 URL = 'url'
 
+# Img
+BASE64 = 'base64'
+SOURCE = 'src'
+PNG = '.png'
+
+# Attribute
+CLASS = 'class'
+VALUE = 'value'
+TYPE = 'type'
+PASSWORD = 'password'

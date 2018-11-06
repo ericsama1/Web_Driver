@@ -28,7 +28,7 @@ from selenium.webdriver.support.select import Select
 from constants.constants import *
 from log.Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
-                      opera_binary_location)
+                      opera_binary_location, pdf_option)
 
 
 class Driver:
@@ -154,8 +154,8 @@ class Driver:
         if device is not None:
             if browser == CHROME:
                 # la emulacion de mobile
-                mobile_emulation = {"deviceName": device}
-                browser_options.add_experimental_option("mobileEmulation",
+                mobile_emulation = {DEVICE_NAME: device}
+                browser_options.add_experimental_option(MOBILE_EMULATION,
                                                         mobile_emulation)
                 self.__log_info(MSJ_MOBILE_EMULATION + device)
             else:
@@ -187,7 +187,7 @@ class Driver:
         if position is not None:
             if browser == CHROME:
                 browser_options.add_argument(WINDOW_POSITION.format(
-                                                position['x'], position['y']))
+                                                position[X], position[Y]))
             else:
                 self.__log_warning(MSJ_INVALID_WINDOW_POSITION + browser)
 
@@ -246,9 +246,7 @@ class Driver:
         for elem in elems:
             if elem.is_displayed():
                 ids.append(elem.get_attribute(ID))
-        self.__log_info('se buscan los elementos {} con el parametro {}'.
-                        format(value, by)
-                        )
+        self.__log_info(MSJ_SEARCH_ELEMENT.format(value, by))
         if len(ids) > 1:
             self.__log_info(MSJ_FIND_ELEMENTS)
         elif len(ids) == 1:
@@ -266,12 +264,11 @@ class Driver:
         :param value: nombre del elemento que se esta buscando
         :return: devuelve una lista de los elementos encontrados
         """
-        self.__log_info('Se buscan elementos {} por {}'.format(value, by))
+        self.__log_info(MSJ_SEARCH_ELEMENTS.format(value, by))
         by = by.lower()
         elems = self.__browser.find_elements(by, value)
         if len(elems) == 0:
-            self.__log_warning("No se encuentra ningun elemento {} con el "
-                               "parametro {}".format(value, by))
+            self.__log_warning(MSJ_ERROR_SEARCH.format(value, by))
         return elems
 
     def buscar_error(self):
@@ -400,7 +397,7 @@ class Driver:
             elem_box = self.get_box(by=None, value=None, elem=element)
             if not self.__compare_box(box, elem_box):
                 self.__log_warning(MSJ_IN_BOX.format(element.get_attibute(
-                                                        'class'), value)
+                                                        CLASS), value)
                                    )
                 return False
             # una vez revisado que los elementos se encuentran dentro del
@@ -412,8 +409,8 @@ class Driver:
             elem_aux = self.check_overlap_element(elem_box, aux)
             if elem_aux is not None:
                 self.__log_warning(MSJ_OVERLAP.format(
-                                          element.get_attribute('class'),
-                                          elem_aux.get_attribute('class')
+                                          element.get_attribute(CLASS),
+                                          elem_aux.get_attribute(CLASS)
                                           )
                                    )
         return True
@@ -566,8 +563,8 @@ class Driver:
             elem = self.__search_element(by, value)  # busco el elemento
         tamano = elem.size  # obtengo el tamano el elemento
         posicion = elem.location  # obtengo la posicion del elemento
-        left = posicion['x']
-        top = posicion['y']
+        left = posicion[X]
+        top = posicion[Y]
         right = left + tamano[WIDTH]
         botton = top + tamano[HEIGHT]
         box = {LEFT: left,
@@ -611,7 +608,7 @@ class Driver:
             return False
         else:
             elem.send_keys(text)
-            if elem.get_attribute('type') == 'password':
+            if elem.get_attribute(TYPE) == PASSWORD:
                 # si es una contrasena, no muestro el valor en el log
                 self.__log_info(MSJ_INPUT_PASSWORD + value)
             else:
@@ -760,7 +757,7 @@ class Driver:
             # Recorro todas las opciones
             for opcion in opciones:
                 # Obtengo el atributo "value" de la opcion
-                valor = opcion.get_atributte('value')
+                valor = opcion.get_atributte(VALUE)
                 # Si el atributo coincide con el select_value guardo
                 # el texto
                 if valor == select_value:
@@ -901,10 +898,10 @@ class Driver:
         se le tiene que agregar una extension de imagen
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        if '.png' in path:
+        if PNG in path:
             self.__browser.save_screenshot(path)
         else:
-            self.__browser.save_screenshot('{}.png'.format(path))
+            self.__browser.save_screenshot('{}{}'.format(path, PNG))
         self.__log_info(MSJ_SAVE_SCREENSHOT + path)
         return True
 
@@ -917,18 +914,15 @@ class Driver:
         :param path: path de donde se guarda la imagen
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
-        try:
-            # primero me fijo que exista el elemento
-            self.__search_element(by, value)
-        except NoSuchElementException:
-            self.__log_error('No existe el elemento {}'.format(value))
+        elem = self.__search_element(by, value)
+        if elem is None:
             return False
         else:
             self.mouse_over(by, value)
-            if '.png' in path:
+            if PNG in path:
                 self.__browser.save_screenshot(path)
             else:
-                self.__browser.save_screenshot('{}.png'.format(path))
+                self.__browser.save_screenshot('{}{}'.format(path, PNG))
             self.__log_info(MSJ_ELEMENT_SCREENSHOT.format(value, path))
             return True
 
@@ -1063,8 +1057,8 @@ class Driver:
                        box[BOTTON])
             # recorto la imagen en las coordenadas que paso en el box
             img = img.crop(box_aux)
-        if '.png' not in dirname:
-            dirname = dirname + '.png'
+        if PNG not in dirname:
+            dirname = dirname + PNG
         img.save(dirname)  # guardo la imagen en el path
         self.__log_info(MSJ_ELEMENT_SCREENSHOT.format(value, dirname))
         return True
@@ -1080,8 +1074,8 @@ class Driver:
         """
         # obtengo el source del elemento que se busca
         try:
-            source = self.get_attribute(by, value, 'src')
-            if "base64" in source:
+            source = self.get_attribute(by, value, SOURCE)
+            if BASE64 in source:
                 # get str
                 source = source.split(',')[1]
                 # decode
@@ -1297,10 +1291,6 @@ class Driver:
         :param dirname: direccion en la que se quiere guardar el pdf
         :return: devuelvo un booleano si se pudo generar el pdf
         """
-        pdf_option = {
-            'page-size': 'A4',
-            'encoding': 'UTF-8'
-        }
         # si se ingresa con la opcion de string, se genera el pdf desde
         # el string del html. Tener en cuenta que este procedimiento
         # no guarda en el pdf las imagenes

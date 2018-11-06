@@ -3,3 +3,8 @@ try:
                                 path_operadriver, opera_binary_location)
 except ImportError:
     pass
+
+pdf_option = {
+    'page-size': 'A4',
+    'encoding': 'UTF-8'
+}
