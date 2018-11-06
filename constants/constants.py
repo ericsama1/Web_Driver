@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
-import locale
+import locale as __locale
 
-if 'es' in locale.getlocale()[0]:
+if 'es' in __locale.getlocale()[0]:
     from constants.message_spanish import *
 else:
     from constants.message_english import *
@@ -32,9 +32,6 @@ HEIGHT = 'height'
 WIDTH = 'width'
 X = 'x'
 Y = 'y'
-
-# Log
-LOG_FILE = 'web_driver.log'
 
 # JS
 BACK = 'window.history.go(-1)'
