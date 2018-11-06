@@ -28,7 +28,7 @@ from selenium.webdriver.support.select import Select
 from constants.constants import *
 from log.Log import Log
 from settings import (path_firefoxdriver, path_chromedriver, path_operadriver,
-                      opera_binary_location, pdf_option)
+                      opera_binary_location, pdf_option, LOG_FILE)
 
 
 class Driver:
@@ -111,6 +111,7 @@ class Driver:
             else:
                 self.set_windows_size(size)
         self.__browser.implicitly_wait(0.3)  # timeout para el wait
+        print (locale)
 
     def __set_options(self, browser, device, headless, incognito,
                       commands, position, fullscreen):
@@ -225,9 +226,16 @@ class Driver:
         """
         self.__log_info(MSJ_SEARCH_ELEMENT.format(value, by))
         try:
+            # busco el elemento
             elem = self.__browser.find_element(by, value)
-            self.__log_info(MSJ_FIND_ELEMENT)
-            return elem
+            # Me fijo si el elemento esta visible y esta habilitado
+            if self.__is_enabled(elem) and self.__is_visible(elem):
+                self.__log_info(MSJ_FIND_ELEMENT)
+                return elem
+            else:
+                # si no esta visible y no esta habilitado devuelvo
+                # None
+                return None
         except NoSuchElementException:
             self.__log_warning(MSJ_INVALID_ELEMENT + value)
             return None
@@ -287,6 +295,18 @@ class Driver:
         except NoSuchElementException:
             return False
 
+    def __is_visible(self, element):
+        """
+        Metodo privado para verificar que un elemento esta visible, sin
+        tener que pasar por el metodo de busqueda y no tener que repetir
+        la busqueda"""
+        if element.is_displayed():
+            self.__log_info(MSJ_IS_VISIBLE)
+            return True
+        else:
+            self.__log_warning(MSJ_IS_NOT_VISIBLE)
+            return False
+
     def is_visible(self, by, value):
         """
         Metodo para verificar si un elemento esta visible
@@ -297,11 +317,21 @@ class Driver:
         """
         elem = self.__search_element(by, value)
         self.__log_info(MSJ_ELEMENT_IS_VISIBLE.format(value))
-        if elem.is_displayed():
-            self.__log_info(MSJ_IS_VISIBLE)
+        if self.__is_visible(elem):
             return True
         else:
-            self.__log_warning(MSJ_IS_NOT_VISIBLE)
+            return False
+
+    def __is_enabled(self, element):
+        """
+        Metodo privado para verificar que un elemento esta 
+        habilitado, sin tener que pasar por el metodo de busqueda
+        y no quede repetido la busqueda"""
+        if element.is_enabled():
+            self.__log_info(MSJ_IS_ENABLED)
+            return True
+        else:
+            self.__log_warning(MSJ_IS_NOT_ENABLED)
             return False
 
     def is_enabled(self, by, value):
@@ -313,11 +343,9 @@ class Driver:
         """
         elem = self.__search_element(by, value)
         self.__log_info(MSJ_ELEMENT_IS_ENABLED.format(value))
-        if elem.is_enabled():
-            self.__log_info(MSJ_IS_ENABLED)
+        if self.__is_enabled(elem):
             return True
         else:
-            self.__log_warning(MSJ_IS_NOT_ENABLED)
             return False
 
     def get_text(self, by, value):
@@ -615,6 +643,12 @@ class Driver:
                 self.__log_info(MSJ_INPUT_TEXT.format(text, value))
             return True
 
+    def __click(self, element):
+        """
+        Metodo privado para hacer click sobre el elemento
+        """
+        element.click()
+
     def click(self, by, value):
         """
         Click sobre el elemento buscado
@@ -627,12 +661,9 @@ class Driver:
         if elem is None:
             return False
         else:
-            if elem.is_enabled():
-                elem.click()
-                self.__log_info(MSJ_CLICK + value)
-                return True
-            else:
-                return False
+            self.__click(elem)
+            self.__log_info(MSJ_CLICK + value)
+            return True
 
     def click_by_text(self, text, tagname='*'):
         """
@@ -652,10 +683,9 @@ class Driver:
         else:
             # Si no se encuentra ningun boton con el texto
             return False
-    
         # Si se encuentra por lo menos 1 elemento, se hace click sobre
         # el primer elemento
-        varios[0].click()
+        self.__click(varios[0])
         self.__log_info(MSJ_CLICK)
         return True
 
