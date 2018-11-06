@@ -1,7 +1,7 @@
 MSJ_BROWSER = 'Start the application in {}'
 MSJ_CLOSE_BROWSER = 'Close the browser'
 MSJ_MOBILE_EMULATION = 'Start with mobile emulation {}'
-MSJ_URL = 'Go to URL: '
+MSJ_URL = 'Go to URL: {}'
 MSJ_SEARCH_ELEMENT = 'Search item "{}", by {}'
 MSJ_SEARCH_ELEMENTS = 'Search items "{}" by {}'
 MSJ_FIND_ELEMENT = 'The element was found'
