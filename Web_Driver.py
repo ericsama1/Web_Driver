@@ -111,7 +111,6 @@ class Driver:
             else:
                 self.set_windows_size(size)
         self.__browser.implicitly_wait(0.3)  # timeout para el wait
-        print (locale)
 
     def __set_options(self, browser, device, headless, incognito,
                       commands, position, fullscreen):
