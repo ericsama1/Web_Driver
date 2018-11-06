@@ -3,6 +3,8 @@ import locale as __locale
 
 if 'es' in __locale.getlocale()[0]:
     from constants.message_spanish import *
+elif 'jp' in __locale.getlocale()[0]:
+    from constants.message_japanese import *
 else:
     from constants.message_english import *
 
