@@ -4,7 +4,11 @@ try:
 except ImportError:
     pass
 
+# Pdf_options
 pdf_option = {
     'page-size': 'A4',
     'encoding': 'UTF-8'
 }
+
+# Log
+LOG_FILE = 'web_driver.log'
