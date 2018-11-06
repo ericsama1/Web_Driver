@@ -1,5 +1,5 @@
-MSJ_BROWSER = 'Se inicia la aplicacion con {}'
-MSJ_CLOSE_BROWSER = 'Se cierra el navegador'
+MSJ_BROWSER = 'アプリを{}で開始します'
+MSJ_CLOSE_BROWSER = 'アプリを終了します'
 MSJ_MOBILE_EMULATION = 'Se inicia con la vista del movil {}'
 MSJ_URL = 'Se abre un tab con la url: {}'
 MSJ_SEARCH_ELEMENT = 'Se busca el elemento "{}", por {}'
