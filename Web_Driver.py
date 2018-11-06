@@ -872,7 +872,8 @@ class Driver:
             self.__log_error(MSJ_INVALID_TAB)
             return False
         else:
-            self.__log_info(MSJ_CHANGE_TAB)
+            url = self.__get_url()
+            self.__log_info(MSJ_CHANGE_TAB.format(url))
             return True
 
     def tabs(self):
@@ -914,8 +915,8 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion"""
         try:
             self.__browser.close()
-            self.change_tab(self.tabs()[0])
             self.__log_info(MSJ_CLOSE_TAB)
+            self.change_tab(self.tabs()[0])
         except WebDriverException:
             self.__log_error(MSJ_INVALID_CLOSE_TAB)
             return False
@@ -1328,7 +1329,7 @@ class Driver:
         # no guarda en el pdf las imagenes
         if option == STRING:
             try:
-                from_string(self.get_html(), dirname, options=pdf_option)
+                from_string(self.__get_html(), dirname, options=pdf_option)
                 self.__log_info(MSJ_PDF.format(dirname))
                 return True
             except OSError:
@@ -1339,7 +1340,7 @@ class Driver:
         # de la pagina.
         elif option == URL:
             try:
-                from_url(self.get_url(), dirname, options=pdf_option)
+                from_url(self.__get_url(), dirname, options=pdf_option)
                 self.__log_info(MSJ_PDF.format(dirname))
                 return True
             except OSError:
@@ -1350,15 +1351,21 @@ class Driver:
             self.__log_warning(MSJ_INVALID_OPTION)
             return False
 
+    def __get_html(self):
+        elem = self.__browser.find_element(XPATH, '//*')
+        source_code = elem.get_attribute('outerHTML')
+        self.__log_info(MSJ_GET_HTML)
+        return source_code
+
     def get_html(self):
         """
         Metodo para obtener el codigo html de la pagina web
         :return: devuelvo el string del html de la pagina web
         """
-        elem = self.__browser.find_element(XPATH, '//*')
-        source_code = elem.get_attribute('outerHTML')
-        self.__log_info(MSJ_GET_HTML)
-        return source_code
+        return self.__get_html()
+
+    def __get_url(self):
+        return self.__browser.current_url
 
     def get_url(self):
         """
@@ -1366,4 +1373,4 @@ class Driver:
         :return: devuelvo el string con la url actual
         """
         self.__log_info(MSJ_GET_URL)
-        return self.__browser.current_url
+        return self.__get_url()
