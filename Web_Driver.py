@@ -228,13 +228,16 @@ class Driver:
             # busco el elemento
             elem = self.__browser.find_element(by, value)
             # Me fijo si el elemento esta visible y esta habilitado
-            if self.__is_enabled(elem) and self.__is_visible(elem):
-                self.__log_info(MSJ_FIND_ELEMENT)
-                return elem
-            else:
-                # si no esta visible y no esta habilitado devuelvo
-                # None
+            if elem is None:
                 return None
+            else:
+                self.__log_info(MSJ_FIND_ELEMENT)
+                if self.__is_enabled(elem) and self.__is_visible(elem):
+                    return elem
+                else:
+                    # si no esta visible y no esta habilitado devuelvo
+                    # None
+                    return None
         except NoSuchElementException:
             self.__log_warning(MSJ_INVALID_ELEMENT.format(value))
             return None
