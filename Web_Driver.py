@@ -147,7 +147,7 @@ class Driver:
             # son chrome y firefox
             print(Fore.RED, MSJ_INVALID_BROWSER, Fore.RESET)
             sys.exit(1)
-        self.__log_info(MSJ_BROWSER + browser)
+        self.__log_info(MSJ_BROWSER.format(browser))
 
         # si el device es None, entonces no se emula
         # la emulacion solo funciona en chrome
@@ -157,9 +157,9 @@ class Driver:
                 mobile_emulation = {DEVICE_NAME: device}
                 browser_options.add_experimental_option(MOBILE_EMULATION,
                                                         mobile_emulation)
-                self.__log_info(MSJ_MOBILE_EMULATION + device)
+                self.__log_info(MSJ_MOBILE_EMULATION.format(device))
             else:
-                self.__log_warning(MSJ_INVALID_EMULATION + browser)
+                self.__log_warning(MSJ_INVALID_EMULATION.format(browser))
 
         # si el flag estan en True, se abre el navegador en modo incognito
         # el argumento es diferente respecto al browser utilizado
@@ -189,7 +189,7 @@ class Driver:
                 browser_options.add_argument(WINDOW_POSITION.format(
                                                 position[X], position[Y]))
             else:
-                self.__log_warning(MSJ_INVALID_WINDOW_POSITION + browser)
+                self.__log_warning(MSJ_INVALID_WINDOW_POSITION.format(browser))
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
@@ -197,7 +197,7 @@ class Driver:
             if browser == CHROME:
                 browser_options.add_argument(FULLSCREEN)
             else:
-                self.__log_warning(MSJ_INVALID_FULLSCREEN + browser)
+                self.__log_warning(MSJ_INVALID_FULLSCREEN.format(browser))
 
         # agrego este argumento para que se quite la barra de scroll en las
         # capturas de pantalla
@@ -212,7 +212,7 @@ class Driver:
     def url(self, url):
         """ funcion para que el browser abra la url deseada """
         self.__browser.get(url=url)
-        self.__log_info(MSJ_URL + url)
+        self.__log_info(MSJ_URL.format(url))
 
     def __search_element(self, by, value):
         """Metodo para buscar un elemento dentro de la pagina
@@ -236,7 +236,7 @@ class Driver:
                 # None
                 return None
         except NoSuchElementException:
-            self.__log_warning(MSJ_INVALID_ELEMENT + value)
+            self.__log_warning(MSJ_INVALID_ELEMENT.format(value))
             return None
 
     def search_ids(self, by, value):
@@ -323,7 +323,7 @@ class Driver:
 
     def __is_enabled(self, element):
         """
-        Metodo privado para verificar que un elemento esta 
+        Metodo privado para verificar que un elemento esta
         habilitado, sin tener que pasar por el metodo de busqueda
         y no quede repetido la busqueda"""
         if element.is_enabled():
@@ -356,7 +356,7 @@ class Driver:
         :return: devuelvo el texto que tiene el elemento
         """
         elem = self.__search_element(by, value)
-        self.__log_info(MSJ_GET_TEXT + value)
+        self.__log_info(MSJ_GET_TEXT.format(value))
         return elem.text
 
     def __get_elements_in_element(self, by, value, class_names):
@@ -637,7 +637,7 @@ class Driver:
             elem.send_keys(text)
             if elem.get_attribute(TYPE) == PASSWORD:
                 # si es una contrasena, no muestro el valor en el log
-                self.__log_info(MSJ_INPUT_PASSWORD + value)
+                self.__log_info(MSJ_INPUT_PASSWORD.format(value))
             else:
                 self.__log_info(MSJ_INPUT_TEXT.format(text, value))
             return True
@@ -661,7 +661,7 @@ class Driver:
             return False
         else:
             self.__click(elem)
-            self.__log_info(MSJ_CLICK + value)
+            self.__log_info(MSJ_CLICK.format(value))
             return True
 
     def click_by_text(self, text, tagname='*'):
@@ -676,9 +676,9 @@ class Driver:
         xpath = '//{}[contains(text(),"{}")]'.format(tagname, text)
         varios = self.__search_many_elements(XPATH, xpath)
         if len(varios) > 1:
-            self.__log_info(MSJ_FIND_MANY_BTN_TEXT + text)
+            self.__log_info(MSJ_FIND_MANY_BTN_TEXT.format(text))
         elif len(varios) == 1:
-            self.__log_info(MSJ_FIND_BTN_TEXT + text)
+            self.__log_info(MSJ_FIND_BTN_TEXT.format(text))
         else:
             # Si no se encuentra ningun boton con el texto
             return False
@@ -903,7 +903,7 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         self.__browser.execute_script(script)
-        self.__log_info(MSJ_EXECUTE_SCRIPT + script)
+        self.__log_info(MSJ_EXECUTE_SCRIPT.format(script))
         return True
 
     def close_tab(self):
@@ -931,7 +931,7 @@ class Driver:
             self.__browser.save_screenshot(path)
         else:
             self.__browser.save_screenshot('{}{}'.format(path, PNG))
-        self.__log_info(MSJ_SAVE_SCREENSHOT + path)
+        self.__log_info(MSJ_SAVE_SCREENSHOT.format(path))
         return True
 
     def elem_screenshot(self, by, value, path):
@@ -1131,7 +1131,7 @@ class Driver:
         else:
             mover = AC(self.__browser).move_to_element(elem)
             mover.perform()
-            self.__log_info(MSJ_MOUSE_OVER + value)
+            self.__log_info(MSJ_MOUSE_OVER.format(value))
             return True
 
     def double_click(self, by, value):
@@ -1142,7 +1142,7 @@ class Driver:
             return False
         else:
             AC(self.__browser).double_click(elem)
-            self.__log_info(MSJ_DOUBLE_CLICK + value)
+            self.__log_info(MSJ_DOUBLE_CLICK.format(value))
             return True
 
     def mouse_scroll(self, by, value, horizontal, vertical):
@@ -1193,7 +1193,7 @@ class Driver:
         else:
             # si se encuentra el elemento, sigo
             elem.clear()
-            self.__log_info(MSJ_CLEAR + value)
+            self.__log_info(MSJ_CLEAR.format(value))
             return True
 
     def clear_all(self):
@@ -1206,7 +1206,7 @@ class Driver:
         elems_select = self.__search_many_elements((XPATH), '//select')
         for elem in elems_input:
             if not elem.clear():
-                self.__log_error(MSJ_CANT_CLEAR + elem.get_attribute(ID))
+                self.__log_error(MSJ_CANT_CLEAR.format(elem.get_attribute(ID)))
         for elem in elems_select:
             select = Select(elem)
             select.select_by_index(0)  # En la pos 0, es la opcion en blanco
@@ -1326,7 +1326,7 @@ class Driver:
         if option == STRING:
             try:
                 from_string(self.get_html(), dirname, options=pdf_option)
-                self.__log_info(MSJ_PDF + dirname)
+                self.__log_info(MSJ_PDF.format(dirname))
                 return True
             except OSError:
                 print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
@@ -1337,7 +1337,7 @@ class Driver:
         elif option == URL:
             try:
                 from_url(self.get_url(), dirname, options=pdf_option)
-                self.__log_info(MSJ_PDF + dirname)
+                self.__log_info(MSJ_PDF.format(dirname))
                 return True
             except OSError:
                 print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
