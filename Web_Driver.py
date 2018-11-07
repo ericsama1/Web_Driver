@@ -1,6 +1,6 @@
 #    Libreria para poder utilizar las funciones de selenium, permitiendo
 #    que se pueda utilizar en Chrome, Firefox y en Opera
-#    Todavia hay funciones que no son compatibles en Firefox y Opera, 
+#    Todavia hay funciones que no son compatibles en Firefox y Opera,
 #    pero en Chrome si estan funcionando
 from sys import exit
 from base64 import b64decode
@@ -216,7 +216,7 @@ class Driver:
                                                 position[X], position[Y]))
         else:
             self.__log_warning(MSJ_INVALID_WINDOW_POSITION.format(browser))
-        
+       
     def __set_fullscreen(self, browser):
         """ Metodo para habilitar el fullscreen"""
         if browser == CHROME:
