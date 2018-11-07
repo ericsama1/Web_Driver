@@ -24,6 +24,11 @@ WINDOW_POSITION = '--window-position={},{}'
 # Device Emulation
 DEVICE_NAME = 'deviceName'
 MOBILE_EMULATION = 'mobileEmulation'
+# Device
+DEVICE_ARRAY = ['Nexus 10', 'Nokia N9', 'iPad Mini', 'iPhone 4',
+                'Galaxy S5', 'iPhone 5', 'iPhone 6', 'iPhone 7',
+                'iPhone 8', 'iPhone 6 Plus', 'iPhone 7 Plus',
+                'iPhone 8 Plus' 'iPhone X', 'iPad', 'iPad Pro']
 
 # Direction
 TOP = 'top'
