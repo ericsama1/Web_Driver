@@ -40,7 +40,7 @@ class Driver:
 
         :param browser: Se ingresa el navegador que se quiere utilizar,
                         por momentos solo se puede utilizar
-                        firefox y chrome
+                        Chrome, Firefox y Opera
         :param device: es para pasar por parametro el dispositivo que
                        se quiere utilizar.
         :param headless: flag para habilitar en modo headless
