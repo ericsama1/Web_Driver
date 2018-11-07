@@ -134,14 +134,14 @@ class Driver:
         """
         # el objeto Options varia segun el navegador
         if browser == FIREFOX:
-            browser_options = FirefoxOptions()
+            self.__browser_options = FirefoxOptions()
         elif browser == CHROME:
-            browser_options = ChromeOptions()
+            self.__browser_options = ChromeOptions()
         elif browser == OPERA:
-            browser_options = OperaOptions()
+            self.__browser_options = OperaOptions()
             # para hacer andar opera, hay que pasarle la direccion del
             # ejecutable de opera
-            browser_options.binary_location = opera_binary_location
+            self.__browser_options.binary_location = opera_binary_location
         else:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
@@ -154,55 +154,75 @@ class Driver:
         if device is not None:
             if browser == CHROME:
                 # la emulacion de mobile
-                mobile_emulation = {DEVICE_NAME: device}
-                browser_options.add_experimental_option(MOBILE_EMULATION,
-                                                        mobile_emulation)
-                self.__log_info(MSJ_MOBILE_EMULATION.format(device))
+                self.__set_device_option(device)
             else:
                 self.__log_warning(MSJ_INVALID_EMULATION.format(browser))
 
         # si el flag estan en True, se abre el navegador en modo incognito
         # el argumento es diferente respecto al browser utilizado
         if incognito:
-            if browser == CHROME:
-                browser_options.add_argument(INCOGNITO)
-            elif (browser == FIREFOX or browser == OPERA):
-                browser_options.add_argument(PRIVATE)
+            self.__set_incoginto(browser)
 
         # si el flag esta en True, se habilita el modo headless
         # el headless no funciona como corresponde en opera
         if headless:
-            if browser == OPERA:
-                self.__log_warning(MSJ_INVALID_HEADLESS)
-            else:
-                browser_options.add_argument(HEADLESS)
+            self.__set_headless(browser)
 
         # dejo esta opcion para que el usuario pueda ingresar a mano los
         # comandos que quiere ingresar manualmente
         if commands is not None:
-            browser_options.add_argument(commands)
+            self.__browser_options.add_argument(commands)
 
         # se puede pasar por parametro la posicion del navegador, funciona con
         # chrome
         if position is not None:
-            if browser == CHROME:
-                browser_options.add_argument(WINDOW_POSITION.format(
-                                                position[X], position[Y]))
-            else:
-                self.__log_warning(MSJ_INVALID_WINDOW_POSITION.format(browser))
+            self.__set_position(browser, position)
 
         # si el flag esta en True, se hace un f11 al browser para dejarlo en
         # fullscreen, solo funciona en chrome
         if fullscreen:
-            if browser == CHROME:
-                browser_options.add_argument(FULLSCREEN)
-            else:
-                self.__log_warning(MSJ_INVALID_FULLSCREEN.format(browser))
+            self.__set_fullscreen(browser)
 
         # agrego este argumento para que se quite la barra de scroll en las
         # capturas de pantalla
-        browser_options.add_argument(HIDE_SCROLLBAR)
-        return browser_options
+        self.__browser_options.add_argument(HIDE_SCROLLBAR)
+        return self.__browser_options
+
+    def __set_device_option(self, device):
+        """ Metodo para poner la opcion de la vista mobile"""
+        mobile_emulation = {DEVICE_NAME: device}
+        self.__browser_options.add_experimental_option(MOBILE_EMULATION,
+                                                       mobile_emulation)
+        self.__log_info(MSJ_MOBILE_EMULATION.format(device))
+
+    def __set_incoginto(self, browser):
+        """ Metodo para poner el modo provado en el browser"""
+        if browser == CHROME:
+            self.__browser_options.add_argument(INCOGNITO)
+        elif (browser == FIREFOX or browser == OPERA):
+            self.__browser_options.add_argument(PRIVATE)
+
+    def __set_headless(self, browser):
+        """ Metodo para habilitar el modo headless"""
+        if browser == OPERA:
+            self.__log_warning(MSJ_INVALID_HEADLESS)
+        else:
+            self.__browser_options.add_argument(HEADLESS)
+
+    def __set_position(self, browser, position):
+        """ Metodo para posicionar el browser """
+        if browser == CHROME:
+            self.__browser_options.add_argument(WINDOW_POSITION.format(
+                                                position[X], position[Y]))
+        else:
+            self.__log_warning(MSJ_INVALID_WINDOW_POSITION.format(browser))
+        
+    def __set_fullscreen(self, browser):
+        """ Metodo para habilitar el fullscreen"""
+        if browser == CHROME:
+            self.__browser_options.add_argument(FULLSCREEN)
+        else:
+            self.__log_warning(MSJ_INVALID_FULLSCREEN.format(browser))
 
     def close(self):
         """ Metodo para cerrar el navegador que se esta utilizando """
@@ -1025,10 +1045,10 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         elem = self.__search_element(by, value)
-        if elem is not None:
-            self.mouse_over(by, value)  # dejo el cursor sobre el elemento
-        else:
+        if elem is None:
             return False
+        else:
+            self.mouse_over(by, value)  # dejo el cursor sobre el elemento
         # Capturo la imagen de toda la pantalla
         img = self.__capturar_pantalla()
 
