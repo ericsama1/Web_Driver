@@ -1,8 +1,8 @@
 #    Libreria para poder utilizar las funciones de selenium, permitiendo
-#    que se pueda utilizar en chrome y en firefox
-#    Todavia hay funciones que no son compatibles en firefox, en chrome
-#    estan funcionando
-import sys
+#    que se pueda utilizar en Chrome, Firefox y en Opera
+#    Todavia hay funciones que no son compatibles en Firefox y Opera, 
+#    pero en Chrome si estan funcionando
+from sys import exit
 from base64 import b64decode
 from io import BytesIO
 from random import choice
@@ -146,7 +146,7 @@ class Driver:
             # si no se ingresa un valor valido, por ahora los valores validos,
             # son chrome y firefox
             print(Fore.RED, MSJ_INVALID_BROWSER, Fore.RESET)
-            sys.exit(1)
+            exit(1)
         self.__log_info(MSJ_BROWSER.format(browser))
 
         # si el device es None, entonces no se emula
@@ -612,6 +612,7 @@ class Driver:
         :return: tamano en [width, height] del elemento que se busco
         """
         elem = self.__search_element(by, value)
+        self.__log_info(MSJ_GET_SIZE.format(elem.size))
         return elem.size
 
     def get_location(self, by, value):
@@ -622,6 +623,7 @@ class Driver:
         :return: coordenadas en [x,y] del elemento que busco
         """
         elem = self.__search_element(by, value)
+        self.__log_info(MSJ_GET_LOCATION.format(elem.location))
         return elem.location
 
     def send_text_to_input(self, by, value, text):
@@ -1035,7 +1037,7 @@ class Driver:
         if not self.__validate_box(box):
             self.__log_warning(MSJ_INVALID_BOX_SIZE)
             print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
-            sys.exit(1)
+            exit(1)
         altura = box[BOTTON] - box[TOP]
         browser_size = self.get_windows_size()
         browser_size[HEIGHT] -= self.__menu_size
@@ -1053,7 +1055,7 @@ class Driver:
             if not self.__validate_box(box_aux):
                 self.__log_warning(MSJ_INVALID_BOX_SIZE)
                 print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
-                sys.exit(1)
+                exit(1)
             img = img.crop(self.__box_to_coordinate(box_aux))
             # verifico que no sea la ultima pantalla
             while altura > scroll + browser_size[HEIGHT]:
@@ -1067,7 +1069,7 @@ class Driver:
                 if not self.__validate_box(box_aux):
                     self.__log_warning(MSJ_INVALID_BOX_SIZE)
                     print(Fore.RED, MSJ_INVALID_BOX_SIZE, Fore.RESET)
-                    sys.exit(1)
+                    exit(1)
                 img2 = img2.crop(self.__box_to_coordinate(box_aux))
                 img = self.__combine_image(img, img2)
                 scroll += browser_size[HEIGHT]
@@ -1160,8 +1162,7 @@ class Driver:
         :return: devuelvo un booleano, por si se pudo realizar la accion
         """
         if self.mouse_over(by, value):
-            self.__browser.execute_script(SCROLL.format(
-                horizontal, vertical))
+            self.__browser.execute_script(SCROLL.format(horizontal, vertical))
             return True
         else:
             return False
@@ -1207,7 +1208,7 @@ class Driver:
         elems_input = self.__search_many_elements(XPATH,
                                                   '//input[starts-with('
                                                   '@id,"id")]')
-        elems_select = self.__search_many_elements((XPATH), '//select')
+        elems_select = self.__search_many_elements(XPATH, '//select')
         for elem in elems_input:
             if not elem.clear():
                 self.__log_error(MSJ_CANT_CLEAR.format(elem.get_attribute(ID)))

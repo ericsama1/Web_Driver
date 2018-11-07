@@ -9,9 +9,9 @@ else:
     from constants.message_english import *
 
 # Browsers
-OPERA = 'opera'
-CHROME = 'chrome'
-FIREFOX = 'firefox'
+OPERA = 'Opera'
+CHROME = 'Chrome'
+FIREFOX = 'Firefox'
 
 # Commands
 INCOGNITO = '--incognito'
