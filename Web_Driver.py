@@ -216,7 +216,7 @@ class Driver:
                                                 position[X], position[Y]))
         else:
             self.__log_warning(MSJ_INVALID_WINDOW_POSITION.format(browser))
-       
+
     def __set_fullscreen(self, browser):
         """ Metodo para habilitar el fullscreen"""
         if browser == CHROME:
