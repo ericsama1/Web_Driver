@@ -1347,7 +1347,7 @@ class Driver:
         """
         # si se ingresa con la opcion de string, se genera el pdf desde
         # el string del html. Tener en cuenta que este procedimiento
-        # no guarda en el pdf las imagenes. Tambien tener en cuenta 
+        # no guarda en el pdf las imagenes. Tambien tener en cuenta
         # que la conversion de de html a pdf suele tardar mucho mas tiempo
         try:
             if option == STRING:
