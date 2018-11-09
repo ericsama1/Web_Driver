@@ -50,7 +50,7 @@ los mismos metodos para diferentes browsers. Por el momento, se puede utlizar en
 
 El init del driver esta compuesto por lo siguiente:
 
-![](driver_init.jpg)
+![](/Images/driver_init.jpg)
 
 Por defecto los valores del driver se muestran en Falso o con valores nulos, y el browser
 que se utiliza por defecto será `Google Chrome`.
