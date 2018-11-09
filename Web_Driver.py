@@ -1347,29 +1347,22 @@ class Driver:
         """
         # si se ingresa con la opcion de string, se genera el pdf desde
         # el string del html. Tener en cuenta que este procedimiento
-        # no guarda en el pdf las imagenes
-        if option == STRING:
-            try:
+        # no guarda en el pdf las imagenes. Tambien tener en cuenta 
+        # que la conversion de de html a pdf suele tardar mucho mas tiempo
+        try:
+            if option == STRING:
                 from_string(self.__get_html(), dirname, options=pdf_option)
                 self.__log_info(MSJ_PDF.format(dirname))
                 return True
-            except OSError:
-                print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
-                self.__log_error()
-                return False
-        # si se ingresa con la opcion de url, se genera el pdf desde la url
-        # de la pagina.
-        elif option == URL:
-            try:
+            elif option == URL:
                 from_url(self.__get_url(), dirname, options=pdf_option)
                 self.__log_info(MSJ_PDF.format(dirname))
                 return True
-            except OSError:
-                print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
-                self.__log_error()
-                return False
-        else:
-            self.__log_warning(MSJ_INVALID_OPTION)
+            else:
+                self.__log_warning(MSJ_INVALID_PDF_OPTION)
+        except OSError:
+            print(Fore.RED, MSJ_ERROR_PDF, Fore.RESET)
+            self.__log_error()
             return False
 
     def __get_html(self):
