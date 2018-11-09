@@ -22,7 +22,9 @@ https://github.com/operasoftware/operachromiumdriver/releases
 ### settings.py
 
 En este archivo pondremos las settings que nosotros utilizaremos en este caso,
-tenemos las opciones de pdf y el path del log
+tenemos las opciones de pdf y el path del log. Esta settings esta compuesto por: 
+
+![](/Images/settings.jpg)
 
 - `pdf_option`: en esta variable, se asigan el formato del pdf que se quiere utilizar. Por 
 defecto esta en modo `page-size: A4` y `encoding: UTF-8`
@@ -36,10 +38,8 @@ Tambien se importaran settings que sean locales con el archivo `settings_local.p
 En esta setting, asignaremos los path de los driver de los browser que se utilizaran.
 Esta setting se ignora en el git, y solo funcionara con las settings locales que se ingresan.
 Se muesta un ejemplo de como se tiene que asignar el path de los driver
-- `path_chromedriver = /home/user/Download/chromedriver`
-- `path_firefoxdriver = /home/user/Download/geckodriver`
-- `path_operadriver = /home/user/Download/operadriver`
-- `opera_binary_location = /usr/bin/opera`
+
+![](/Images/settings_local.jpg)
 
 ## Como utilizar
 
