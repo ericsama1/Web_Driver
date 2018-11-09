@@ -14,4 +14,4 @@ el modo incognito, headless, etc
 
 ## Mensajes
 Para los mensajes que se escriben en el log, se importaran según el idioma que esta configurado
-el OS que se está utilizando
+el OS que se está utilizando. Se importa el objeto locale para poder obtener el idioma en la que está configurado el OS; y dependiendo de este, se importará los mensajes que correspondan.
