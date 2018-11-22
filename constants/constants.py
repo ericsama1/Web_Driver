@@ -12,6 +12,7 @@ else:
 OPERA = 'Opera'
 CHROME = 'Chrome'
 FIREFOX = 'Firefox'
+IE = 'Internet Explorer'
 
 # Commands
 INCOGNITO = '--incognito'
@@ -49,6 +50,7 @@ NEW_TAB = 'window.open("{}");'
 XPATH = By.XPATH
 ID = By.ID
 CLASS_NAME = By.CLASS_NAME
+NAME = By.NAME
 
 # Pdf_options
 STRING = 'string'
