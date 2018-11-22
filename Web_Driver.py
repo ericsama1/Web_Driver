@@ -21,6 +21,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.opera.options import Options as OperaOptions
+from selenium.webdriver.ie.options import Options as IeOptions
 from selenium.webdriver.common.action_chains import ActionChains as AC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
@@ -137,6 +138,8 @@ class Driver:
             self.__browser_options = FirefoxOptions()
         elif browser == CHROME:
             self.__browser_options = ChromeOptions()
+        elif browser == IE:
+            self.__browser_options = IeOptions()
         elif browser == OPERA:
             self.__browser_options = OperaOptions()
             # para hacer andar opera, hay que pasarle la direccion del
@@ -1388,3 +1391,7 @@ class Driver:
         """
         self.__log_info(MSJ_GET_URL)
         return self.__get_url()
+
+    def refresh_page(self):
+        """Metodo para actualizar la pagina actual"""
+        self.__browser.refresh
